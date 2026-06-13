@@ -1,2 +1,30 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body {
+  @apply bg-white text-gray-800 dark:bg-[#0d0d1a] dark:text-white;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.menu-slide-enter {
+  animation: slideDown 0.25s ease forwards;
+}
