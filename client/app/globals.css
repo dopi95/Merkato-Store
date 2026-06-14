@@ -17,7 +17,7 @@ body {
 
 .animate-marquee {
   display: inline-block;
-  animation: marquee 70s linear infinite;
+  animation: marquee 90s linear infinite;
 }
 
 @keyframes slideDown {
