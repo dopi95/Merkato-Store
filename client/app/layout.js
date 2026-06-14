@@ -2,6 +2,7 @@ import "./globals.css";
 import { LangProvider } from "./context/LangContext";
 
 export const metadata = {
+  metadataBase: new URL('https://merkatostore.com'),
   title: "Merkato Store — Your Premium Marketplace",
   description: "Merkato Store — Discover premium products at unbeatable prices. Your ultimate online shopping destination.",
   icons: {
