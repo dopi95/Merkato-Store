@@ -1,6 +1,4 @@
 import "./globals.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import { LangProvider } from "./context/LangContext";
 
 export const metadata = {
@@ -39,11 +37,12 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <LangProvider>
-          <Header />
           {children}
-          <Footer />
         </LangProvider>
       </body>
     </html>
   );
 }
+
+
+
