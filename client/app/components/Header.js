@@ -143,7 +143,7 @@ export default function Header() {
 
         {/* Logo */}
         <Link href="/" className="shrink-0" onClick={() => setMenuOpen(false)}>
-          <Image src="/images/logo.png" alt="Merkato Store" width={155} height={50} priority />
+          <Image src="/images/logo.png" alt="Merkato Store" width={155} height={50} priority style={{ width: "155px", height: "auto" }} />
         </Link>
 
         {/* Search — desktop */}
@@ -213,7 +213,7 @@ export default function Header() {
           <div className="hidden md:block relative" ref={langRef}>
             <button onClick={() => setLangOpen(!langOpen)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border ${br} ${muted} hover:text-[#f0a500] hover:border-[#f0a500]/50 text-sm font-medium transition-colors cursor-pointer`}>
-              <Image src={currentLang.flag} alt={currentLang.native} width={20} height={14} className="rounded-sm object-cover" />
+              <Image src={currentLang.flag} alt={currentLang.native} width={20} height={14} className="rounded-sm object-cover" style={{ width: "20px", height: "auto" }} />
               <span>{lang.toUpperCase()}</span>
               <FiChevronDown size={13} style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
             </button>
@@ -224,7 +224,7 @@ export default function Header() {
                     onMouseDown={(e) => { e.preventDefault(); setLang(l.code); setLangOpen(false); }}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer transition-colors
                       ${lang === l.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
-                    <Image src={l.flag} alt={l.native} width={22} height={16} className="rounded-sm object-cover shrink-0" />
+                    <Image src={l.flag} alt={l.native} width={22} height={16} className="rounded-sm object-cover shrink-0" style={{ width: "22px", height: "auto" }} />
                     <span>{l.native}</span>
                     {lang === l.code && <span className="ml-auto text-[#f0a500] text-xs">✓</span>}
                   </button>
@@ -365,7 +365,7 @@ export default function Header() {
             <div className="relative flex-1" ref={langRef}>
               <button onClick={() => setLangOpen(!langOpen)}
                 className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border ${br} ${muted} hover:text-[#f0a500] hover:border-[#f0a500]/40 text-xs font-medium transition-colors cursor-pointer`}>
-                <Image src={currentLang.flag} alt={currentLang.native} width={18} height={13} className="rounded-sm object-cover" />
+                <Image src={currentLang.flag} alt={currentLang.native} width={18} height={13} className="rounded-sm object-cover" style={{ width: "18px", height: "auto" }} />
                 <span>{lang.toUpperCase()}</span>
                 <FiChevronDown size={11} style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
               </button>
@@ -376,7 +376,7 @@ export default function Header() {
                       onMouseDown={(e) => { e.preventDefault(); setLang(l.code); setLangOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm cursor-pointer transition-colors
                         ${lang === l.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
-                      <Image src={l.flag} alt={l.native} width={20} height={14} className="rounded-sm object-cover shrink-0" />
+                      <Image src={l.flag} alt={l.native} width={20} height={14} className="rounded-sm object-cover shrink-0" style={{ width: "20px", height: "auto" }} />
                       <span>{l.native}</span>
                       {lang === l.code && <span className="ml-auto text-[#f0a500] text-xs">✓</span>}
                     </button>

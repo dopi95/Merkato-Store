@@ -28,3 +28,11 @@ body {
 .menu-slide-enter {
   animation: slideDown 0.25s ease forwards;
 }
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
