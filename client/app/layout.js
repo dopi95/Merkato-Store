@@ -1,5 +1,6 @@
 import "./globals.css";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 export const metadata = {
   title: "Merkato Store — Your Premium Marketplace",
@@ -38,6 +39,7 @@ export default function RootLayout({ children }) {
       <body>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
