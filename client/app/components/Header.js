@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BsSun, BsMoon, BsTruck, BsGlobe2, BsLightningChargeFill } from "react-icons/bs";
 import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdOutlineChair, MdOutlineDiamond, MdOutlineInfo, MdOutlinePhone, MdOutlineHelpOutline } from "react-icons/md";
+import { useLang } from "../context/LangContext";
 
 const navLinksEN = [
   { label: "Electronics",        href: "/electronics",  icon: <MdDevices size={18} />,           cat: true  },
@@ -54,7 +55,7 @@ export default function Header() {
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [searchOpen,   setSearchOpen]   = useState(false);
   const [dark,         setDark]         = useState(false);
-  const [lang,         setLang]         = useState("en");
+  const { lang, setLang }              = useLang();
   const [langOpen,     setLangOpen]     = useState(false);
   const [currency,     setCurrency]     = useState("USD");
   const [currencyOpen, setCurrencyOpen] = useState(false);
@@ -73,11 +74,6 @@ export default function Header() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
   }, [dark]);
-
-  useEffect(() => {
-    document.documentElement.dir  = isAR ? "rtl" : "ltr";
-    document.documentElement.lang = lang;
-  }, [lang, isAR]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -175,10 +171,11 @@ export default function Header() {
               <FiChevronDown size={13} style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
             </button>
             {langOpen && (
-              <div className={`absolute right-0 mt-2 w-44 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-50`}>
+              <div className={`absolute right-0 mt-2 w-44 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-[999]`}>
                 {languages.map(l => (
-                  <button key={l.code} onClick={() => { setLang(l.code); setLangOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
+                  <button key={l.code}
+                    onMouseDown={(e) => { e.preventDefault(); setLang(l.code); setLangOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer transition-colors
                       ${lang === l.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                     <Image src={l.flag} alt={l.native} width={22} height={16} className="rounded-sm object-cover shrink-0" />
                     <span>{l.native}</span>
@@ -311,10 +308,11 @@ export default function Header() {
                 <FiChevronDown size={11} style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
               </button>
               {langOpen && (
-                <div className={`absolute left-0 mt-2 w-40 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-50`}>
+                <div className={`absolute left-0 mt-2 w-40 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-[999]`}>
                   {languages.map(l => (
-                    <button key={l.code} onClick={() => { setLang(l.code); setLangOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                    <button key={l.code}
+                      onMouseDown={(e) => { e.preventDefault(); setLang(l.code); setLangOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm cursor-pointer transition-colors
                         ${lang === l.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <Image src={l.flag} alt={l.native} width={20} height={14} className="rounded-sm object-cover shrink-0" />
                       <span>{l.native}</span>

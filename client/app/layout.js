@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { LangProvider } from "./context/LangContext";
 
 export const metadata = {
   title: "Merkato Store — Your Premium Marketplace",
@@ -37,9 +38,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <LangProvider>
+          <Header />
+          {children}
+          <Footer />
+        </LangProvider>
       </body>
     </html>
   );
