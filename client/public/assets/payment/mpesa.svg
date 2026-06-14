@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 165 105">
+  <rect width="165" height="105" rx="10" fill="#fff" stroke="#e0e0e0" stroke-width="2"/>
+  <rect x="12" y="28" width="141" height="49" rx="6" fill="#EF2E24"/>
+  <text x="50%" y="57%" dominant-baseline="middle" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="22" font-weight="900" fill="#fff">M-PESA</text>
+</svg>
