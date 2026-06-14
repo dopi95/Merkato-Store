@@ -2,8 +2,9 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BsSun, BsMoon, BsTruck, BsGlobe2, BsLightningChargeFill } from "react-icons/bs";
-import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevronRight, FiUser } from "react-icons/fi";
 import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdOutlineChair, MdOutlineDiamond, MdOutlineInfo, MdOutlinePhone, MdOutlineHelpOutline } from "react-icons/md";
 import { useLang } from "../context/LangContext";
 
@@ -42,26 +43,47 @@ const languages = [
 ];
 
 const currencies = [
-  { code: "USD", sign: "$",   label: "US Dollar" },
-  { code: "NGN", sign: "₦",   label: "Nigerian Naira" },
-  { code: "ETB", sign: "Br",  label: "Ethiopian Birr" },
-  { code: "KES", sign: "KSh", label: "Kenyan Shilling" },
-  { code: "AED", sign: "د.إ", label: "UAE Dirham" },
-  { code: "EGP", sign: "E£",  label: "Egyptian Pound" },
-  { code: "SAR", sign: "SR",  label: "Saudi Riyal" },
+  { code: "USD", sign: "$",   label: "US Dollar",         labelAR: "دولار أمريكي" },
+  { code: "NGN", sign: "₦",   label: "Nigerian Naira",    labelAR: "نايرا نيجيري" },
+  { code: "ETB", sign: "Br",  label: "Ethiopian Birr",    labelAR: "بير إثيوبي" },
+  { code: "KES", sign: "KSh", label: "Kenyan Shilling",   labelAR: "شلن كيني" },
+  { code: "AED", sign: "د.إ", label: "UAE Dirham",        labelAR: "درهم إماراتي" },
+  { code: "EGP", sign: "E£",  label: "Egyptian Pound",    labelAR: "جنيه مصري" },
+  { code: "SAR", sign: "SR",  label: "Saudi Riyal",       labelAR: "ريال سعودي" },
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [searchOpen,   setSearchOpen]   = useState(false);
-  const [dark,         setDark]         = useState(false);
+  const [dark,         setDarkState]    = useState(false);
   const { lang, setLang }              = useLang();
   const [langOpen,     setLangOpen]     = useState(false);
-  const [currency,     setCurrency]     = useState("USD");
+  const [currency,     setCurrencyState] = useState("USD");
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [userOpen,     setUserOpen]     = useState(false);
+
+  // Load persisted values
+  useEffect(() => {
+    const savedCurrency = localStorage.getItem("merkato_currency");
+    if (savedCurrency) setCurrencyState(savedCurrency);
+    const savedDark = localStorage.getItem("merkato_dark");
+    if (savedDark === "true") setDarkState(true);
+  }, []);
+
+  function setCurrency(val) {
+    setCurrencyState(val);
+    localStorage.setItem("merkato_currency", val);
+  }
+
+  function setDark(val) {
+    setDarkState(val);
+    localStorage.setItem("merkato_dark", String(val));
+  }
 
   const langRef     = useRef(null);
   const currencyRef = useRef(null);
+  const userRef     = useRef(null);
 
   const isAR            = lang === "ar";
   const secondary       = isAR ? secondaryAR : secondaryEN;
@@ -79,6 +101,7 @@ export default function Header() {
     const handler = (e) => {
       if (langRef.current     && !langRef.current.contains(e.target))     setLangOpen(false);
       if (currencyRef.current && !currencyRef.current.contains(e.target)) setCurrencyOpen(false);
+      if (userRef.current     && !userRef.current.contains(e.target))     setUserOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -106,9 +129,9 @@ export default function Header() {
         <div className="animate-marquee whitespace-nowrap">
           {[...Array(6)].map((_, i) => (
             <span key={i} className="inline-flex items-center">
-              <span className="mx-6 inline-flex items-center gap-1.5"><BsTruck size={13} className="text-[#f0a500]" /> Free shipping on orders over $100 across Africa &amp; the Middle East</span>
+              <span className="mx-6 inline-flex items-center gap-1.5"><BsTruck size={13} className="text-[#f0a500]" /> {isAR ? "شحن مجاني للطلبات فوق $100 عبر أفريقيا والشرق الأوسط" : "Free shipping on orders over $100 across Africa & the Middle East"}</span>
               <span className="text-[#f0a500] mx-2">·</span>
-              <span className="mx-6 inline-flex items-center gap-1.5"><BsGlobe2 size={12} className="text-[#f0a500]" /> Nigeria · Kenya · Ethiopia · UAE · Egypt · Saudi Arabia · and more...</span>
+              <span className="mx-6 inline-flex items-center gap-1.5"><BsGlobe2 size={12} className="text-[#f0a500]" /> {isAR ? "نيجيريا · كينيا · إثيوبيا · الإمارات · مصر · السعودية · وأكثر..." : "Nigeria · Kenya · Ethiopia · UAE · Egypt · Saudi Arabia · and more..."}</span>
               <span className="text-[#f0a500] mx-2">·</span>
             </span>
           ))}
@@ -119,7 +142,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-3">
 
         {/* Logo */}
-        <Link href="/" className="shrink-0">
+        <Link href="/" className="shrink-0" onClick={() => setMenuOpen(false)}>
           <Image src="/images/logo.png" alt="Merkato Store" width={155} height={50} priority />
         </Link>
 
@@ -154,13 +177,37 @@ export default function Header() {
             <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#f0a500] text-white text-[10px] font-bold flex items-center justify-center">0</span>
           </Link>
 
-          <Link href="/signin" className="hidden md:inline-flex items-center ml-1 px-4 py-2 rounded-full border border-[#f0a500] text-[#f0a500] text-sm font-medium hover:bg-[#f0a500]/10 transition-colors">
-            {isAR ? "تسجيل الدخول" : "Sign In"}
-          </Link>
-
-          <Link href="/register" className="hidden md:inline-flex items-center px-4 py-2 rounded-full bg-[#f0a500] text-white text-sm font-bold hover:bg-[#c97000] transition-colors">
-            {isAR ? "إنشاء حساب" : "Register"}
-          </Link>
+          {/* User dropdown — desktop */}
+          <div className="hidden md:block relative" ref={userRef}>
+            <button
+              onClick={() => setUserOpen(!userOpen)}
+              onMouseEnter={() => setUserOpen(true)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${br} ${muted} hover:text-[#f0a500] hover:border-[#f0a500]/50 transition-colors cursor-pointer`}
+            >
+              <FiUser size={18} />
+              <span className="text-xs font-medium leading-tight text-left">
+                <span className="block text-[10px] opacity-60">{isAR ? "مرحباً" : "Welcome"}</span>
+                <span>{isAR ? "دخول / تسجيل" : "Sign in / Register"}</span>
+              </span>
+              <FiChevronDown size={13} style={{ transform: userOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+            </button>
+            {userOpen && (
+              <div
+                className={`absolute right-0 mt-2 w-48 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-[999]`}
+              >
+                <div className="px-3 py-3 flex flex-col gap-2">
+                  <button onMouseDown={() => { setUserOpen(false); router.push("/signin"); }}
+                    className={`block w-full text-center px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-sm ${navTxt} hover:border-[#f0a500] hover:text-[#f0a500] transition-colors cursor-pointer`}>
+                    {isAR ? "تسجيل الدخول" : "Sign In"}
+                  </button>
+                  <button onMouseDown={() => { setUserOpen(false); router.push("/register"); }}
+                    className="block w-full text-center px-4 py-2 rounded-full border border-[#f0a500] text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white transition-colors cursor-pointer">
+                    {isAR ? "إنشاء حساب" : "Register"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Language — desktop */}
           <div className="hidden md:block relative" ref={langRef}>
@@ -225,7 +272,7 @@ export default function Header() {
               <button onClick={() => setCurrencyOpen(!currencyOpen)}
                 className={`flex items-center gap-1.5 px-3 py-3 text-sm font-medium ${muted} hover:text-[#f0a500] transition-colors cursor-pointer`}>
                 <span className="text-[#f0a500] font-bold">{currentCurrency.sign}</span>
-                <span>{currentCurrency.code}</span>
+                <span>{isAR ? currentCurrency.labelAR : currentCurrency.label}</span>
                 <FiChevronDown size={12} style={{ transform: currencyOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
               </button>
               {currencyOpen && (
@@ -235,7 +282,7 @@ export default function Header() {
                       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
                         ${currency === c.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <span className="w-8 font-bold text-[#f0a500] shrink-0">{c.sign}</span>
-                      <span>{c.label}</span>
+                      <span>{isAR ? c.labelAR : c.label}</span>
                       {currency === c.code && <span className="ml-auto text-[#f0a500] text-xs">✓</span>}
                     </button>
                   ))}
@@ -276,22 +323,37 @@ export default function Header() {
       {/* ── MOBILE MENU ── */}
       <div
         className={`md:hidden ${nBg} border-t ${br} flex flex-col transition-all duration-300 ease-in-out overflow-hidden ${
-          menuOpen ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
+          menuOpen ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
         }`}
         dir={isAR ? "rtl" : "ltr"}
         style={{ overflowY: menuOpen ? "auto" : "hidden" }}
       >
 
-          {/* Auth buttons */}
-          <div className="px-4 pb-3 flex gap-3">
-            <Link href="/signin" onClick={() => setMenuOpen(false)}
-              className="flex-1 text-center py-2.5 rounded-full border border-[#f0a500] text-[#f0a500] text-sm font-medium hover:bg-[#f0a500]/10 transition-colors">
-              {isAR ? "تسجيل الدخول" : "Sign In"}
-            </Link>
-            <Link href="/register" onClick={() => setMenuOpen(false)}
-              className="flex-1 text-center py-2.5 rounded-full bg-[#f0a500] text-white text-sm font-bold hover:bg-[#c97000] transition-colors">
-              {isAR ? "إنشاء حساب" : "Register"}
-            </Link>
+          {/* Auth — mobile accordion */}
+          <div className="px-4 pt-3 pb-3" ref={userRef}>
+            <button
+              onClick={() => setUserOpen(!userOpen)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border ${br} ${muted} hover:text-[#f0a500] hover:border-[#f0a500]/40 transition-colors`}
+            >
+              <FiUser size={18} className="text-[#f0a500] shrink-0" />
+              <span className="flex-1 text-left">
+                <span className="block text-[10px] opacity-60">{isAR ? "مرحباً" : "Welcome"}</span>
+                <span className="text-sm font-medium">{isAR ? "دخول / تسجيل" : "Sign in / Register"}</span>
+              </span>
+              <FiChevronDown size={15} style={{ transform: userOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+            </button>
+            {userOpen && (
+              <div className={`mt-1 rounded-xl border ${br} ${nBg} px-3 py-3 flex flex-col gap-2`}>
+                <button onClick={() => { setMenuOpen(false); setUserOpen(false); setTimeout(() => router.push("/signin"), 10); }}
+                  className={`w-full text-center px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-sm ${navTxt} hover:border-[#f0a500] hover:text-[#f0a500] transition-colors`}>
+                  {isAR ? "تسجيل الدخول" : "Sign In"}
+                </button>
+                <button onClick={() => { setMenuOpen(false); setUserOpen(false); setTimeout(() => router.push("/register"), 10); }}
+                  className="w-full text-center px-4 py-2 rounded-full border border-[#f0a500] text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white transition-colors">
+                  {isAR ? "إنشاء حساب" : "Register"}
+                </button>
+              </div>
+            )}
           </div>
 
           <div className={`border-t ${br}`} />
@@ -328,7 +390,7 @@ export default function Header() {
               <button onClick={() => setCurrencyOpen(!currencyOpen)}
                 className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border ${br} ${muted} hover:text-[#f0a500] hover:border-[#f0a500]/40 text-xs font-medium transition-colors cursor-pointer`}>
                 <span className="text-[#f0a500] font-bold">{currentCurrency.sign}</span>
-                <span>{currentCurrency.code}</span>
+                <span>{isAR ? currentCurrency.labelAR : currentCurrency.label}</span>
                 <FiChevronDown size={11} style={{ transform: currencyOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
               </button>
               {currencyOpen && (
@@ -338,7 +400,7 @@ export default function Header() {
                       className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
                         ${currency === c.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <span className="w-7 font-bold text-[#f0a500] shrink-0 text-sm">{c.sign}</span>
-                      <span>{c.label}</span>
+                      <span>{isAR ? c.labelAR : c.label}</span>
                       {currency === c.code && <span className="ml-auto text-[#f0a500] text-xs">✓</span>}
                     </button>
                   ))}
@@ -363,11 +425,11 @@ export default function Header() {
             </p>
             <div className="grid grid-cols-2 gap-2">
               {categories.map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
+                <button key={link.href} onClick={() => { setMenuOpen(false); setTimeout(() => router.push(link.href), 10); }}
                   className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border ${br} ${navTxt} hover:text-[#f0a500] hover:border-[#f0a500]/40 hover:bg-[#f0a500]/5 text-sm font-medium transition-all`}>
                   <span className="text-[#f0a500]">{link.icon}</span>
                   <span className="truncate">{link.label}</span>
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -376,14 +438,14 @@ export default function Header() {
 
           {/* Deals highlight */}
           <div className="px-4 pb-2">
-            <Link href="/deals" onClick={() => setMenuOpen(false)}
+            <button onClick={() => { setMenuOpen(false); setTimeout(() => router.push("/deals"), 10); }}
               className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-[#f0a500]/10 border border-[#f0a500]/30 text-[#f0a500] font-semibold text-sm hover:bg-[#f0a500]/20 transition-colors">
               <span className="flex items-center gap-2">
                 <BsLightningChargeFill size={15} />
                 {isAR ? "العروض والتخفيضات" : "Deals & Offers"}
               </span>
               <FiChevronRight size={16} />
-            </Link>
+            </button>
           </div>
 
           {/* Secondary links */}
@@ -393,14 +455,14 @@ export default function Header() {
             </p>
             <div className="flex flex-col gap-0.5">
               {secondaryLinks.filter(l => !l.highlight).map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
-                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg ${navTxt} hover:text-[#f0a500] hover:bg-[#f0a500]/5 text-sm transition-colors`}>
+                <button key={link.href} onClick={() => { setMenuOpen(false); setTimeout(() => router.push(link.href), 10); }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg ${navTxt} hover:text-[#f0a500] hover:bg-[#f0a500]/5 text-sm transition-colors`}>
                   <span className="flex items-center gap-2.5">
                     <span className="text-[#f0a500]">{link.icon}</span>
                     {link.label}
                   </span>
                   <FiChevronRight size={14} className="opacity-40" />
-                </Link>
+                </button>
               ))}
             </div>
           </div>
