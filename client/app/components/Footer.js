@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -7,6 +7,7 @@ import {
   BsFacebook, BsInstagram, BsTwitterX, BsYoutube, BsTiktok,
 } from "react-icons/bs";
 import { FiMail, FiPhone, FiMapPin, FiArrowRight } from "react-icons/fi";
+import { useLang } from "../context/LangContext";
 import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdOutlineChair, MdOutlineDiamond } from "react-icons/md";
 
 const content = {
@@ -47,18 +48,9 @@ const socials = [
 ];
 
 export default function Footer() {
-  const [lang, setLang]       = useState("en");
+  const { lang }              = useLang();
   const [email, setEmail]     = useState("");
   const [submitted, setSubmitted] = useState(false);
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setLang(document.documentElement.lang || "en");
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
-    setLang(document.documentElement.lang || "en");
-    return () => observer.disconnect();
-  }, []);
 
   const isAR = lang === "ar";
   const t    = content[isAR ? "ar" : "en"];
