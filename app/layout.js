@@ -2,7 +2,7 @@ import "./globals.css";
 import Providers from "./context/Providers";
 
 export const metadata = {
-  metadataBase: new URL('https://merkatostore.com'),
+  metadataBase: new URL('https://merkato-store-pr.vercel.app'),
   title: "Merkato Store — Your Premium Marketplace",
   description: "Merkato Store — Discover premium products at unbeatable prices. Your ultimate online shopping destination.",
   icons: {
@@ -17,9 +17,9 @@ export const metadata = {
     siteName: 'Merkato Store',
     images: [
       {
-        url: '/assets/favicon.png',
-        width: 512,
-        height: 512,
+        url: '/images/logo.png',
+        width: 1200,
+        height: 630,
         alt: 'Merkato Store Logo',
       },
     ],
@@ -29,7 +29,7 @@ export const metadata = {
     card: 'summary',
     title: "Merkato Store — Your Premium Marketplace",
     description: "Discover premium products at unbeatable prices.",
-    images: ['/assets/favicon.png'],
+    images: ['/images/logo.png'],
   },
 };
 
