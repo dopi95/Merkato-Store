@@ -13,7 +13,7 @@ export const metadata = {
   openGraph: {
     title: "Merkato Store — Your Premium Marketplace",
     description: "Discover premium products at unbeatable prices. Your ultimate online shopping destination.",
-    url: 'https://merkatostore.com',
+    url: 'https://merkato-store-pr.vercel.app',
     siteName: 'Merkato Store',
     images: [
       {
