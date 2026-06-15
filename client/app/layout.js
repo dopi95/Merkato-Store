@@ -1,5 +1,5 @@
 import "./globals.css";
-import { LangProvider } from "./context/LangContext";
+import Providers from "./context/Providers";
 
 export const metadata = {
   metadataBase: new URL('https://merkatostore.com'),
@@ -37,9 +37,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <LangProvider>
+        <Providers>
           {children}
-        </LangProvider>
+        </Providers>
       </body>
     </html>
   );

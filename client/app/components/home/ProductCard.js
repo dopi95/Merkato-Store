@@ -3,9 +3,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { FiHeart, FiShoppingBag, FiStar } from "react-icons/fi";
 import { BsLightningChargeFill } from "react-icons/bs";
+import { useCurrency } from "../../context/CurrencyContext";
 
 export default function ProductCard({ product, isAR }) {
   const [wished, setWished] = useState(false);
+  const { convertPrice, sign } = useCurrency();
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -71,11 +73,11 @@ export default function ProductCard({ product, isAR }) {
         <div className="flex items-center justify-between mt-auto pt-2">
           <div className="flex items-baseline gap-1 flex-wrap">
             <span className="text-sm sm:text-base md:text-lg font-extrabold text-gray-800 dark:text-white">
-              ${product.price}
+              {sign}{convertPrice(product.price)}
             </span>
             {product.originalPrice && (
               <span className="text-[10px] sm:text-xs text-gray-400 dark:text-white/30 line-through">
-                ${product.originalPrice}
+                {sign}{convertPrice(product.originalPrice)}
               </span>
             )}
           </div>

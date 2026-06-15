@@ -7,6 +7,7 @@ import { BsSun, BsMoon, BsTruck, BsGlobe2, BsLightningChargeFill } from "react-i
 import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevronRight, FiUser } from "react-icons/fi";
 import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdOutlineChair, MdOutlineDiamond, MdOutlineInfo, MdOutlinePhone, MdOutlineHelpOutline } from "react-icons/md";
 import { useLang } from "../context/LangContext";
+import { useCurrency, currencies } from "../context/CurrencyContext";
 
 const navLinksEN = [
   { label: "Electronics",        href: "/electronics",  icon: <MdDevices size={18} />,           cat: true  },
@@ -42,16 +43,6 @@ const languages = [
   { code: "ar", native: "العربية", flag: "/assets/flag-sa.svg" },
 ];
 
-const currencies = [
-  { code: "USD", sign: "$",   label: "US Dollar",         labelAR: "دولار أمريكي" },
-  { code: "NGN", sign: "₦",   label: "Nigerian Naira",    labelAR: "نايرا نيجيري" },
-  { code: "ETB", sign: "Br",  label: "Ethiopian Birr",    labelAR: "بير إثيوبي" },
-  { code: "KES", sign: "KSh", label: "Kenyan Shilling",   labelAR: "شلن كيني" },
-  { code: "AED", sign: "د.إ", label: "UAE Dirham",        labelAR: "درهم إماراتي" },
-  { code: "EGP", sign: "E£",  label: "Egyptian Pound",    labelAR: "جنيه مصري" },
-  { code: "SAR", sign: "SR",  label: "Saudi Riyal",       labelAR: "ريال سعودي" },
-];
-
 export default function Header() {
   const router = useRouter();
   const [menuOpen,     setMenuOpen]     = useState(false);
@@ -59,22 +50,15 @@ export default function Header() {
   const [dark,         setDarkState]    = useState(false);
   const { lang, setLang }              = useLang();
   const [langOpen,     setLangOpen]     = useState(false);
-  const [currency,     setCurrencyState] = useState("USD");
+  const { currency, setCurrency }       = useCurrency();
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [userOpen,     setUserOpen]     = useState(false);
 
   // Load persisted values
   useEffect(() => {
-    const savedCurrency = localStorage.getItem("merkato_currency");
-    if (savedCurrency) setCurrencyState(savedCurrency);
     const savedDark = localStorage.getItem("merkato_dark");
     if (savedDark === "true") setDarkState(true);
   }, []);
-
-  function setCurrency(val) {
-    setCurrencyState(val);
-    localStorage.setItem("merkato_currency", val);
-  }
 
   function setDark(val) {
     setDarkState(val);
@@ -278,8 +262,8 @@ export default function Header() {
               {currencyOpen && (
                 <div className={`absolute left-0 top-full mt-1 w-52 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-50`}>
                   {currencies.map(c => (
-                    <button key={c.code} onClick={() => { setCurrency(c.code); setCurrencyOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
+                    <button key={c.code} onMouseDown={(e) => { e.preventDefault(); setCurrency(c.code); setCurrencyOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer transition-colors
                         ${currency === c.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <span className="w-8 font-bold text-[#f0a500] shrink-0">{c.sign}</span>
                       <span>{isAR ? c.labelAR : c.label}</span>
@@ -396,8 +380,8 @@ export default function Header() {
               {currencyOpen && (
                 <div className={`absolute left-0 mt-2 w-48 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-50`}>
                   {currencies.map(c => (
-                    <button key={c.code} onClick={() => { setCurrency(c.code); setCurrencyOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors
+                    <button key={c.code} onMouseDown={(e) => { e.preventDefault(); setCurrency(c.code); setCurrencyOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm cursor-pointer transition-colors
                         ${currency === c.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <span className="w-7 font-bold text-[#f0a500] shrink-0 text-sm">{c.sign}</span>
                       <span>{isAR ? c.labelAR : c.label}</span>

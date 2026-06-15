@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FiArrowRight, FiArrowLeft, FiStar } from "react-icons/fi";
 import { BsLightningChargeFill, BsFire } from "react-icons/bs";
 import { useLang } from "../../context/LangContext";
+import { useCurrency } from "../../context/CurrencyContext";
 
 const slides = [
   {
@@ -99,6 +100,7 @@ function Stars({ rating }) {
 export default function HeroBanner() {
   const { lang } = useLang();
   const isAR = lang === "ar";
+  const { convertPrice, sign } = useCurrency();
   const [current,   setCurrent]   = useState(0);
   const [activeTab, setActiveTab] = useState("featured");
   const [headerH,   setHeaderH]   = useState(140);
@@ -276,9 +278,9 @@ export default function HeroBanner() {
                     </p>
                     <Stars rating={p.rating} />
                     <div className="flex items-center gap-1 mt-0.5">
-                      <span className="text-xs sm:text-sm font-extrabold text-gray-800 dark:text-white">${p.price}</span>
+                      <span className="text-xs sm:text-sm font-extrabold text-gray-800 dark:text-white">{sign}{convertPrice(p.price)}</span>
                       {p.original && (
-                        <span className="text-[10px] text-gray-400 dark:text-white/30 line-through">${p.original}</span>
+                        <span className="text-[10px] text-gray-400 dark:text-white/30 line-through">{sign}{convertPrice(p.original)}</span>
                       )}
                     </div>
                   </div>
