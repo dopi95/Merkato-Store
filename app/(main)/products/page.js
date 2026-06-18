@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FiHeart, FiShoppingBag, FiStar, FiSliders, FiX, FiChevronDown } from "react-icons/fi";
@@ -27,6 +27,14 @@ const sortOptions = [
 ];
 
 export default function ShopPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-[#0d0d1a]" />}>
+      <ShopPageInner />
+    </Suspense>
+  );
+}
+
+function ShopPageInner() {
   const { lang } = useLang();
   const { convertPrice, sign } = useCurrency();
   const isAR = lang === "ar";
