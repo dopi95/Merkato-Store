@@ -36,3 +36,9 @@ body {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+@media print {
+  header, footer, nav, button, a[href]:not([href*="receipt"]) { display: none !important; }
+  body { background: white !important; color: black !important; }
+  #receipt-content { border: 1px solid #ddd !important; }
+}

@@ -41,8 +41,8 @@ const slides = [
     badge:   { en: "Flash Sale",       ar: "تخفيضات سريعة"     },
     heading: { en: "Up to 60% Off\nTop Products",               ar: "خصم يصل إلى 60%\nعلى أفضل المنتجات"  },
     sub:     { en: "Limited time deals on electronics, fashion, beauty and more. Don't miss out.", ar: "عروض محدودة على الإلكترونيات والأزياء والتجميل وأكثر. لا تفوتك." },
-    cta:     { en: "See All Deals",    ar: "عرض كل الصفقات"     },
-    href:    "/products",
+    cta:     { en: "Shop Now",         ar: "تسوق الآن"          },
+    href:    "/deals",
   },
 ];
 
@@ -205,7 +205,7 @@ export default function HeroBanner() {
                   {isAR ? <FiArrowLeft size={14} /> : <FiArrowRight size={14} />}
                 </Link>
                 <Link
-                  href="/products"
+                  href="/deals"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white bg-white/10 border border-white/50 hover:bg-white/20 hover:border-white/80 transition-all whitespace-nowrap z-10 backdrop-blur-sm"
                 >
                   {isAR ? "كل العروض" : "All Deals"}

@@ -14,8 +14,8 @@ const content = {
   en: {
     tagline: "Your premium marketplace across Africa & the Middle East.",
     newsletter: { heading: "Stay in the loop", sub: "Get exclusive deals, new arrivals and offers straight to your inbox.", placeholder: "Your email address", btn: "Subscribe" },
-    shop: { title: "Shop", links: [{ label: "Electronics", href: "/electronics" }, { label: "Fashion & Clothing", href: "/fashion" }, { label: "Groceries", href: "/groceries" }, { label: "Beauty Products", href: "/beauty" }, { label: "Household Items", href: "/household" }, { label: "Accessories", href: "/accessories" }, { label: "Deals & Offers", href: "/deals" }] },
-    company: { title: "Company", links: [{ label: "About Us", href: "/about" }, { label: "Careers", href: "/careers" }, { label: "Press", href: "/press" }, { label: "Blog", href: "/blog" }, { label: "Affiliate Program", href: "/affiliate" }] },
+    shop: { title: "Shop", links: [{ label: "Electronics", href: "/products?cat=electronics" }, { label: "Fashion & Clothing", href: "/products?cat=fashion" }, { label: "Groceries", href: "/products?cat=groceries" }, { label: "Beauty Products", href: "/products?cat=beauty" }, { label: "Household Items", href: "/products?cat=household" }, { label: "Accessories", href: "/products?cat=accessories" }, { label: "Deals & Offers", href: "/deals" }] },
+    company: { title: "Company", links: [{ label: "About Us", href: "/about" }, { label: "Careers", href: "/careers" }, { label: "Affiliate Program", href: "/affiliate" }] },
     support: { title: "Support", links: [{ label: "Help Center / FAQ", href: "/faq" }, { label: "Contact Us", href: "/contact" }, { label: "Track Your Order", href: "/track" }, { label: "Returns & Refunds", href: "/returns" }, { label: "Shipping Info", href: "/shipping" }] },
     legal: { title: "Legal", links: [{ label: "Privacy Policy", href: "/privacy" }, { label: "Terms of Service", href: "/terms" }, { label: "Cookie Policy", href: "/cookies" }] },
     contact: { title: "Contact", email: "support@merkatostore.com", phone: "+1 (800) 123-4567", address: "Serving Africa & the Middle East" },
@@ -27,8 +27,8 @@ const content = {
   ar: {
     tagline: "سوقك المميز عبر أفريقيا والشرق الأوسط.",
     newsletter: { heading: "ابقَ على اطلاع", sub: "احصل على عروض حصرية ووصولات جديدة مباشرة إلى بريدك.", placeholder: "بريدك الإلكتروني", btn: "اشترك" },
-    shop: { title: "تسوق", links: [{ label: "الإلكترونيات", href: "/electronics" }, { label: "الأزياء والملابس", href: "/fashion" }, { label: "البقالة", href: "/groceries" }, { label: "منتجات التجميل", href: "/beauty" }, { label: "المستلزمات المنزلية", href: "/household" }, { label: "الإكسسوارات", href: "/accessories" }, { label: "العروض والتخفيضات", href: "/deals" }] },
-    company: { title: "الشركة", links: [{ label: "من نحن", href: "/about" }, { label: "وظائف", href: "/careers" }, { label: "الصحافة", href: "/press" }, { label: "المدونة", href: "/blog" }, { label: "برنامج الإحالة", href: "/affiliate" }] },
+    shop: { title: "تسوق", links: [{ label: "الإلكترونيات", href: "/products?cat=electronics" }, { label: "الأزياء والملابس", href: "/products?cat=fashion" }, { label: "البقالة", href: "/products?cat=groceries" }, { label: "منتجات التجميل", href: "/products?cat=beauty" }, { label: "المستلزمات المنزلية", href: "/products?cat=household" }, { label: "الإكسسوارات", href: "/products?cat=accessories" }, { label: "العروض والتخفيضات", href: "/deals" }] },
+    company: { title: "الشركة", links: [{ label: "من نحن", href: "/about" }, { label: "وظائف", href: "/careers" }, { label: "برنامج الإحالة", href: "/affiliate" }] },
     support: { title: "الدعم", links: [{ label: "مركز المساعدة / الأسئلة الشائعة", href: "/faq" }, { label: "تواصل معنا", href: "/contact" }, { label: "تتبع طلبك", href: "/track" }, { label: "الإرجاع والاسترداد", href: "/returns" }, { label: "معلومات الشحن", href: "/shipping" }] },
     legal: { title: "قانوني", links: [{ label: "سياسة الخصوصية", href: "/privacy" }, { label: "شروط الخدمة", href: "/terms" }, { label: "سياسة ملفات تعريف الارتباط", href: "/cookies" }] },
     contact: { title: "تواصل", email: "support@merkatostore.com", phone: "+1 (800) 123-4567", address: "نخدم أفريقيا والشرق الأوسط" },
