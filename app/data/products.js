@@ -1,3 +1,42 @@
+// Shared variant data by category
+export const variantsByCategory = {
+  fashion: {
+    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    colors: [
+      { name: "Black",    nameAR: "أسود",   hex: "#1a1a1a" },
+      { name: "White",    nameAR: "أبيض",   hex: "#f5f5f5" },
+      { name: "Navy",     nameAR: "كحلي",   hex: "#1e3a5f" },
+      { name: "Beige",    nameAR: "بيج",    hex: "#d4b896" },
+      { name: "Olive",    nameAR: "زيتي",   hex: "#6b7c45" },
+    ],
+  },
+  electronics: {
+    colors: [
+      { name: "Black",       nameAR: "أسود",       hex: "#1a1a1a" },
+      { name: "Silver",      nameAR: "فضي",        hex: "#b0b8c1" },
+      { name: "Space Gray",  nameAR: "رمادي",      hex: "#4a4a4a" },
+      { name: "White",       nameAR: "أبيض",       hex: "#f5f5f5" },
+    ],
+  },
+  beauty: {
+    shades: [
+      { name: "Nude",    nameAR: "نود",     hex: "#c8a882" },
+      { name: "Rose",    nameAR: "وردي",    hex: "#e8a0a0" },
+      { name: "Berry",   nameAR: "توتي",    hex: "#8b2252" },
+      { name: "Coral",   nameAR: "مرجاني",  hex: "#e8735a" },
+      { name: "Red",     nameAR: "أحمر",    hex: "#cc2222" },
+    ],
+  },
+  accessories: {
+    colors: [
+      { name: "Black",  nameAR: "أسود",  hex: "#1a1a1a" },
+      { name: "Brown",  nameAR: "بني",   hex: "#7b4f2e" },
+      { name: "Tan",    nameAR: "بيج غامق", hex: "#c8956c" },
+      { name: "Navy",   nameAR: "كحلي",  hex: "#1e3a5f" },
+    ],
+  },
+};
+
 export const products = [
   // Electronics
   { id: 1,  name: "Wireless Noise-Cancelling Headphones", nameAR: "سماعات لاسلكية بإلغاء الضوضاء",      brand: "SoundPro",   emoji: "🎧", price: 79,  originalPrice: 120,  rating: 4, reviews: 312, isNew: false, cat: "electronics",
