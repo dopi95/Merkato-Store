@@ -12,7 +12,7 @@ const promos = [
     heading: { en: "Up to 60% Off\nElectronics",       ar: "خصم يصل إلى 60%\nعلى الإلكترونيات"  },
     sub:  { en: "Limited time — grab the best deals before they're gone.", ar: "وقت محدود — استغل أفضل العروض قبل نفادها." },
     cta:  { en: "Shop Now",    ar: "تسوق الآن"        },
-    href: "/deals",
+    href: "/products",
     img:  "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&q=80",
   },
   {
@@ -22,7 +22,7 @@ const promos = [
     heading: { en: "Fresh Fashion\nCollection",        ar: "مجموعة أزياء\nموسم جديد"            },
     sub:  { en: "Discover the latest trends from top designers worldwide.", ar: "اكتشف أحدث صيحات الموضة من أشهر المصممين عالمياً." },
     cta:  { en: "Explore",     ar: "استكشف"           },
-    href: "/fashion",
+    href: "/products",
     img:  "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80",
   },
 ];

@@ -4,18 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsSun, BsMoon, BsTruck, BsGlobe2, BsLightningChargeFill } from "react-icons/bs";
-import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevronRight, FiUser } from "react-icons/fi";
+import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevronRight, FiUser, FiStar } from "react-icons/fi";
 import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdOutlineChair, MdOutlineDiamond, MdOutlineInfo, MdOutlinePhone, MdOutlineHelpOutline } from "react-icons/md";
 import { useLang } from "../context/LangContext";
 import { useCurrency, currencies } from "../context/CurrencyContext";
+import { products } from "../data/products";
 
 const navLinksEN = [
-  { label: "Electronics",        href: "/electronics",  icon: <MdDevices size={18} />,           cat: true  },
-  { label: "Fashion & Clothing", href: "/fashion",      icon: <MdOutlineCheckroom size={18} />,  cat: true  },
-  { label: "Groceries",          href: "/groceries",    icon: <MdOutlineShoppingCart size={18} />,cat: true },
-  { label: "Beauty Products",    href: "/beauty",       icon: <MdOutlineSpa size={18} />,         cat: true  },
-  { label: "Household Items",    href: "/household",    icon: <MdOutlineChair size={18} />,       cat: true  },
-  { label: "Accessories",        href: "/accessories",  icon: <MdOutlineDiamond size={18} />,     cat: true  },
+  { label: "Electronics",        href: "/products?cat=electronics",  catKey: "electronics",  icon: <MdDevices size={18} />,            cat: true },
+  { label: "Fashion & Clothing", href: "/products?cat=fashion",      catKey: "fashion",      icon: <MdOutlineCheckroom size={18} />,   cat: true },
+  { label: "Groceries",          href: "/products?cat=groceries",    catKey: "groceries",    icon: <MdOutlineShoppingCart size={18} />, cat: true },
+  { label: "Beauty Products",    href: "/products?cat=beauty",       catKey: "beauty",       icon: <MdOutlineSpa size={18} />,          cat: true },
+  { label: "Household Items",    href: "/products?cat=household",    catKey: "household",    icon: <MdOutlineChair size={18} />,        cat: true },
+  { label: "Accessories",        href: "/products?cat=accessories",  catKey: "accessories",  icon: <MdOutlineDiamond size={18} />,      cat: true },
   { label: "About",              href: "/about",        icon: <MdOutlineInfo size={18} /> },
   { label: "Contact",            href: "/contact",      icon: <MdOutlinePhone size={18} /> },
   { label: "FAQ",                href: "/faq",          icon: <MdOutlineHelpOutline size={18} /> },
@@ -23,12 +24,12 @@ const navLinksEN = [
 ];
 
 const navLinksAR = [
-  { label: "الإلكترونيات",        href: "/electronics",  icon: <MdDevices size={18} />,            cat: true },
-  { label: "الأزياء والملابس",     href: "/fashion",      icon: <MdOutlineCheckroom size={18} />,   cat: true },
-  { label: "البقالة",             href: "/groceries",    icon: <MdOutlineShoppingCart size={18} />, cat: true },
-  { label: "منتجات التجميل",      href: "/beauty",       icon: <MdOutlineSpa size={18} />,          cat: true },
-  { label: "المستلزمات المنزلية",  href: "/household",    icon: <MdOutlineChair size={18} />,        cat: true },
-  { label: "الإكسسوارات",         href: "/accessories",  icon: <MdOutlineDiamond size={18} />,      cat: true },
+  { label: "الإلكترونيات",        href: "/products?cat=electronics",  catKey: "electronics",  icon: <MdDevices size={18} />,            cat: true },
+  { label: "الأزياء والملابس",     href: "/products?cat=fashion",      catKey: "fashion",      icon: <MdOutlineCheckroom size={18} />,   cat: true },
+  { label: "البقالة",             href: "/products?cat=groceries",    catKey: "groceries",    icon: <MdOutlineShoppingCart size={18} />, cat: true },
+  { label: "منتجات التجميل",      href: "/products?cat=beauty",       catKey: "beauty",       icon: <MdOutlineSpa size={18} />,          cat: true },
+  { label: "المستلزمات المنزلية",  href: "/products?cat=household",    catKey: "household",    icon: <MdOutlineChair size={18} />,        cat: true },
+  { label: "الإكسسوارات",         href: "/products?cat=accessories",  catKey: "accessories",  icon: <MdOutlineDiamond size={18} />,      cat: true },
   { label: "من نحن",             href: "/about",        icon: <MdOutlineInfo size={18} /> },
   { label: "تواصل معنا",          href: "/contact",      icon: <MdOutlinePhone size={18} /> },
   { label: "الأسئلة الشائعة",     href: "/faq",          icon: <MdOutlineHelpOutline size={18} /> },
@@ -50,9 +51,40 @@ export default function Header() {
   const [dark,         setDarkState]    = useState(false);
   const { lang, setLang }              = useLang();
   const [langOpen,     setLangOpen]     = useState(false);
-  const { currency, setCurrency }       = useCurrency();
+  const { currency, setCurrency, convertPrice, sign } = useCurrency();
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [userOpen,     setUserOpen]     = useState(false);
+  const [query,        setQuery]        = useState("");
+  const [showResults,  setShowResults]  = useState(false);
+  const [activeCat,    setActiveCat]    = useState(null);
+  const searchRef = useRef(null);
+  const navRef    = useRef(null);
+
+  const catProducts = activeCat
+    ? products.filter(p => p.cat === activeCat).slice(0, 4)
+    : [];
+
+  const searchResults = query.trim().length > 0
+    ? products.filter(p =>
+        p.name.toLowerCase().includes(query.toLowerCase()) ||
+        p.brand.toLowerCase().includes(query.toLowerCase()) ||
+        (p.tags || []).some(t => t.includes(query.toLowerCase()))
+      ).slice(0, 6)
+    : [];
+
+  function handleSearchSubmit(e) {
+    e.preventDefault();
+    if (query.trim()) {
+      setShowResults(false);
+      router.push(`/products?search=${encodeURIComponent(query.trim())}`);
+    }
+  }
+
+  function handleResultClick() {
+    setQuery("");
+    setShowResults(false);
+    setSearchOpen(false);
+  }
 
   // Load persisted values
   useEffect(() => {
@@ -86,6 +118,8 @@ export default function Header() {
       if (langRef.current     && !langRef.current.contains(e.target))     setLangOpen(false);
       if (currencyRef.current && !currencyRef.current.contains(e.target)) setCurrencyOpen(false);
       if (userRef.current     && !userRef.current.contains(e.target))     setUserOpen(false);
+      if (searchRef.current   && !searchRef.current.contains(e.target))   setShowResults(false);
+      if (navRef.current       && !navRef.current.contains(e.target))       setActiveCat(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -131,17 +165,70 @@ export default function Header() {
         </Link>
 
         {/* Search — desktop */}
-        <div className="hidden md:flex flex-1 mx-4">
-          <div className={`flex items-center w-full max-w-xl rounded-full border border-[#f0a500]/40 focus-within:border-[#f0a500] focus-within:shadow-md focus-within:shadow-[#f0a500]/10 transition-all overflow-hidden`}>
-            <span className={`pl-4 pr-2 ${muted} shrink-0`}><FiSearch size={17} /></span>
-            <input type="text"
-              placeholder={isAR ? "ابحث عن منتجات، ماركات، فئات..." : "Search products, brands, categories..."}
-              dir={isAR ? "rtl" : "ltr"}
-              className={`flex-1 ${inputCls} text-sm py-2.5 pr-2 outline-none`} />
-            <button className="bg-[#f0a500] hover:bg-[#c97000] transition-colors px-6 py-2.5 text-white text-sm font-semibold shrink-0 cursor-pointer">
-              {isAR ? "بحث" : "Search"}
-            </button>
-          </div>
+        <div className="hidden md:flex flex-1 mx-4 relative" ref={searchRef}>
+          <form onSubmit={handleSearchSubmit} className="w-full">
+            <div className={`flex items-center w-full max-w-xl rounded-full border border-[#f0a500]/40 focus-within:border-[#f0a500] focus-within:shadow-md focus-within:shadow-[#f0a500]/10 transition-all overflow-hidden`}>
+              <span className={`pl-4 pr-2 ${muted} shrink-0`}><FiSearch size={17} /></span>
+              <input
+                type="text"
+                value={query}
+                onChange={e => { setQuery(e.target.value); setShowResults(true); }}
+                onFocus={() => setShowResults(true)}
+                placeholder={isAR ? "ابحث عن منتجات، ماركات، فئات..." : "Search products, brands, categories..."}
+                dir={isAR ? "rtl" : "ltr"}
+                className={`flex-1 ${inputCls} text-sm py-2.5 pr-2 outline-none`}
+              />
+              {query && (
+                <button type="button" onClick={() => { setQuery(""); setShowResults(false); }} className={`px-2 ${muted} hover:text-[#f0a500]`}>
+                  <FiX size={15} />
+                </button>
+              )}
+              <button type="submit" className="bg-[#f0a500] hover:bg-[#c97000] transition-colors px-6 py-2.5 text-white text-sm font-semibold shrink-0 cursor-pointer">
+                {isAR ? "بحث" : "Search"}
+              </button>
+            </div>
+          </form>
+          {/* Dropdown results */}
+          {showResults && searchResults.length > 0 && (
+            <div className={`absolute top-full left-0 right-0 max-w-xl mt-2 rounded-2xl border ${br} ${nBg} shadow-xl overflow-hidden z-[999]`}>
+              {searchResults.map(p => (
+                <Link
+                  key={p.id}
+                  href={`/products/${p.id}`}
+                  onClick={handleResultClick}
+                  className={`flex items-center gap-3 px-4 py-3 hover:bg-[#f0a500]/5 transition-colors border-b ${br} last:border-b-0`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-[#0f0f1a] flex items-center justify-center shrink-0 text-2xl">
+                    {p.emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">{isAR ? p.nameAR : p.name}</p>
+                    <p className="text-xs text-[#f0a500] font-medium">{p.brand}</p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <FiStar key={i} size={10} className={i < Math.floor(p.rating) ? "fill-[#f0a500] text-[#f0a500]" : "text-gray-200 dark:text-white/20"} />
+                      ))}
+                      <span className={`text-[10px] ${muted}`}>({p.reviews})</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-extrabold text-gray-800 dark:text-white">{sign}{convertPrice(p.price)}</p>
+                    {p.originalPrice && (
+                      <p className={`text-[10px] ${muted} line-through`}>{sign}{convertPrice(p.originalPrice)}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+              <Link
+                href={`/products?search=${encodeURIComponent(query)}`}
+                onClick={handleResultClick}
+                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500]/5 transition-colors"
+              >
+                <FiSearch size={14} />
+                {isAR ? `عرض جميع نتائج "${query}"` : `See all results for "${query}"`}
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Right actions */}
@@ -233,22 +320,64 @@ export default function Header() {
 
       {/* Search bar — mobile */}
       {searchOpen && (
-        <div className="md:hidden px-4 pb-3">
-          <div className={`flex items-center rounded-full border border-[#f0a500]/40 focus-within:border-[#f0a500] focus-within:shadow-md focus-within:shadow-[#f0a500]/10 transition-all overflow-hidden`}>
-            <span className={`pl-4 pr-2 ${muted} shrink-0`}><FiSearch size={17} /></span>
-            <input type="text"
-              placeholder={isAR ? "ابحث عن منتجات، ماركات، فئات..." : "Search products, brands, categories..."}
-              autoFocus dir={isAR ? "rtl" : "ltr"}
-              className={`flex-1 ${inputCls} text-sm py-2.5 pr-2 outline-none`} />
-            <button className="bg-[#f0a500] hover:bg-[#c97000] transition-colors px-5 py-2.5 text-white text-sm font-semibold shrink-0 cursor-pointer">
-              {isAR ? "بحث" : "Search"}
-            </button>
-          </div>
+        <div className="md:hidden px-4 pb-3" ref={searchRef}>
+          <form onSubmit={handleSearchSubmit}>
+            <div className={`flex items-center rounded-full border border-[#f0a500]/40 focus-within:border-[#f0a500] focus-within:shadow-md focus-within:shadow-[#f0a500]/10 transition-all overflow-hidden`}>
+              <span className={`pl-4 pr-2 ${muted} shrink-0`}><FiSearch size={17} /></span>
+              <input
+                type="text"
+                value={query}
+                onChange={e => { setQuery(e.target.value); setShowResults(true); }}
+                onFocus={() => setShowResults(true)}
+                placeholder={isAR ? "ابحث عن منتجات، ماركات، فئات..." : "Search products, brands, categories..."}
+                autoFocus dir={isAR ? "rtl" : "ltr"}
+                className={`flex-1 ${inputCls} text-sm py-2.5 pr-2 outline-none`}
+              />
+              {query && (
+                <button type="button" onClick={() => { setQuery(""); setShowResults(false); }} className={`px-2 ${muted}`}>
+                  <FiX size={15} />
+                </button>
+              )}
+              <button type="submit" className="bg-[#f0a500] hover:bg-[#c97000] transition-colors px-5 py-2.5 text-white text-sm font-semibold shrink-0 cursor-pointer">
+                {isAR ? "بحث" : "Search"}
+              </button>
+            </div>
+          </form>
+          {/* Mobile dropdown results */}
+          {showResults && searchResults.length > 0 && (
+            <div className={`mt-2 rounded-2xl border ${br} ${nBg} shadow-xl overflow-hidden z-[999]`}>
+              {searchResults.map(p => (
+                <Link
+                  key={p.id}
+                  href={`/products/${p.id}`}
+                  onClick={handleResultClick}
+                  className={`flex items-center gap-3 px-4 py-3 hover:bg-[#f0a500]/5 transition-colors border-b ${br} last:border-b-0`}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-[#0f0f1a] flex items-center justify-center shrink-0 text-xl">
+                    {p.emoji}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">{isAR ? p.nameAR : p.name}</p>
+                    <p className="text-xs text-[#f0a500] font-medium">{p.brand}</p>
+                  </div>
+                  <p className="text-sm font-extrabold text-gray-800 dark:text-white shrink-0">{sign}{convertPrice(p.price)}</p>
+                </Link>
+              ))}
+              <Link
+                href={`/products?search=${encodeURIComponent(query)}`}
+                onClick={handleResultClick}
+                className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500]/5 transition-colors"
+              >
+                <FiSearch size={14} />
+                {isAR ? `عرض جميع النتائج` : `See all results`}
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
       {/* ── NAV BAR — desktop ── */}
-      <nav className={`hidden md:block border-t ${br} ${nBg} transition-colors duration-300`}>
+      <nav className={`hidden md:block border-t ${br} ${nBg} transition-colors duration-300`} ref={navRef}>
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center">
             {/* Currency */}
@@ -274,14 +403,28 @@ export default function Header() {
               )}
             </div>
             <div className={`w-px h-4 border-l ${br} mx-1`} />
-            {/* Category links */}
+            {/* Category links with dropdowns */}
             <ul className="flex items-center gap-1">
               {navLinks.filter(l => !secondary.includes(l.label)).map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href}
-                    className={`flex items-center gap-1 whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors ${navTxt} hover:text-[#f0a500]`}>
-                    {link.label}<FiChevronDown size={13} />
-                  </Link>
+                <li key={link.href} className="relative">
+                  {link.cat ? (
+                    <button
+                      onMouseEnter={() => setActiveCat(link.catKey)}
+                      onMouseLeave={() => {}}
+                      onClick={() => setActiveCat(activeCat === link.catKey ? null : link.catKey)}
+                      className={`flex items-center gap-1 whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors cursor-pointer ${
+                        activeCat === link.catKey ? "text-[#f0a500]" : `${navTxt} hover:text-[#f0a500]`
+                      }`}
+                    >
+                      {link.label}
+                      <FiChevronDown size={13} style={{ transform: activeCat === link.catKey ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+                    </button>
+                  ) : (
+                    <Link href={link.href}
+                      className={`flex items-center gap-1 whitespace-nowrap px-3 py-3 text-sm font-medium transition-colors ${navTxt} hover:text-[#f0a500]`}>
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -302,6 +445,84 @@ export default function Header() {
             ))}
           </ul>
         </div>
+
+        {/* ── CATEGORY DROPDOWN PANEL ── */}
+        {activeCat && (
+          <div
+            className={`absolute left-0 right-0 ${nBg} border-t border-b ${br} shadow-xl z-[998]`}
+            onMouseEnter={() => setActiveCat(activeCat)}
+            onMouseLeave={() => setActiveCat(null)}
+          >
+            <div className="max-w-7xl mx-auto px-4 py-5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[#f0a500]">
+                  {isAR ? "أبرز المنتجات" : "Top Products"}
+                </p>
+                <Link
+                  href={`/products?cat=${activeCat}`}
+                  onClick={() => setActiveCat(null)}
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#f0a500] hover:underline"
+                >
+                  {isAR ? "عرض جميع المنتجات" : "See all products"}
+                  {isAR ? <FiChevronRight size={13} className="rotate-180" /> : <FiChevronRight size={13} />}
+                </Link>
+              </div>
+              {catProducts.length === 0 ? (
+                <p className={`text-sm ${muted}`}>{isAR ? "لا توجد منتجات" : "No products found"}</p>
+              ) : (
+                <div className="grid grid-cols-4 gap-4">
+                  {catProducts.map(p => {
+                    const disc = p.originalPrice
+                      ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)
+                      : null;
+                    return (
+                      <Link
+                        key={p.id}
+                        href={`/products/${p.id}`}
+                        onClick={() => setActiveCat(null)}
+                        className={`group flex flex-col rounded-xl border ${br} bg-gray-50 dark:bg-[#0f0f1a] hover:border-[#f0a500]/40 hover:shadow-md transition-all duration-200 overflow-hidden`}
+                      >
+                        {/* Image */}
+                        <div className="relative h-32 flex items-center justify-center bg-white dark:bg-[#13112a]">
+                          {disc && (
+                            <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full bg-[#e05c5c] text-white text-[10px] font-bold">
+                              -{disc}%
+                            </span>
+                          )}
+                          {p.isNew && (
+                            <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-[#22c55e] text-white text-[10px] font-bold">
+                              {isAR ? "جديد" : "New"}
+                            </span>
+                          )}
+                          <span className="text-5xl group-hover:scale-110 transition-transform duration-200">{p.emoji}</span>
+                        </div>
+                        {/* Info */}
+                        <div className="p-3 flex flex-col gap-1">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#f0a500]">{p.brand}</p>
+                          <p className="text-xs font-semibold text-gray-800 dark:text-white line-clamp-2 group-hover:text-[#f0a500] transition-colors">
+                            {isAR ? p.nameAR : p.name}
+                          </p>
+                          <div className="flex items-center gap-0.5 mt-0.5">
+                            {[...Array(5)].map((_, i) => (
+                              <FiStar key={i} size={10} className={i < Math.floor(p.rating) ? "fill-[#f0a500] text-[#f0a500]" : "text-gray-200 dark:text-white/20"} />
+                            ))}
+                            <span className={`text-[10px] ${muted} ml-1`}>({p.reviews})</span>
+                          </div>
+                          <div className="flex items-baseline gap-1.5 mt-1">
+                            <span className="text-sm font-extrabold text-gray-800 dark:text-white">{sign}{convertPrice(p.price)}</span>
+                            {p.originalPrice && (
+                              <span className={`text-[10px] ${muted} line-through`}>{sign}{convertPrice(p.originalPrice)}</span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── MOBILE MENU ── */}

@@ -14,7 +14,7 @@ export default function ProductCard({ product, isAR }) {
     : null;
 
   return (
-    <div className="group relative flex flex-col bg-white dark:bg-[#13112a] rounded-xl sm:rounded-2xl border border-gray-100 dark:border-white/5 overflow-hidden hover:shadow-xl hover:shadow-black/8 dark:hover:shadow-black/40 hover:border-[#f0a500]/30 transition-all duration-300">
+    <Link href={`/products/${product.id}`} className="group relative flex flex-col bg-white dark:bg-[#13112a] rounded-xl sm:rounded-2xl border border-gray-100 dark:border-white/5 overflow-hidden hover:shadow-xl hover:shadow-black/8 dark:hover:shadow-black/40 hover:border-[#f0a500]/30 transition-all duration-300">
 
       {/* Badges */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
@@ -32,7 +32,7 @@ export default function ProductCard({ product, isAR }) {
 
       {/* Wishlist */}
       <button
-        onClick={() => setWished(!wished)}
+        onClick={(e) => { e.preventDefault(); setWished(!wished); }}
         className="absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-sm flex items-center justify-center border border-gray-100 dark:border-white/10 hover:border-[#f0a500]/50 transition-all cursor-pointer shadow-sm"
       >
         <FiHeart size={13} className={wished ? "fill-[#e05c5c] text-[#e05c5c]" : "text-gray-400 dark:text-white/40"} />
@@ -50,12 +50,9 @@ export default function ProductCard({ product, isAR }) {
         <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-[#f0a500]">
           {product.brand}
         </p>
-        <Link
-          href={`/products/${product.id}`}
-          className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-white line-clamp-2 hover:text-[#f0a500] transition-colors leading-snug"
-        >
+        <p className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-white line-clamp-2 group-hover:text-[#f0a500] transition-colors leading-snug">
           {isAR ? product.nameAR : product.name}
-        </Link>
+        </p>
 
         {/* Rating */}
         <div className="flex items-center gap-0.5 sm:gap-1">
@@ -81,11 +78,11 @@ export default function ProductCard({ product, isAR }) {
               </span>
             )}
           </div>
-          <button className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-[#f0a500]/10 hover:bg-[#f0a500] border border-[#f0a500]/30 hover:border-[#f0a500] text-[#f0a500] hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0">
+          <button onClick={(e) => e.preventDefault()} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-[#f0a500]/10 hover:bg-[#f0a500] border border-[#f0a500]/30 hover:border-[#f0a500] text-[#f0a500] hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0">
             <FiShoppingBag size={14} />
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

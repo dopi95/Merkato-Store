@@ -4,12 +4,12 @@ import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdO
 import { useLang } from "../../context/LangContext";
 
 const categories = [
-  { href: "/electronics", icon: <MdDevices size={28} />,            en: "Electronics",        ar: "الإلكترونيات",       color: "#3b82f6", bg: "#3b82f615" },
-  { href: "/fashion",     icon: <MdOutlineCheckroom size={28} />,   en: "Fashion",            ar: "الأزياء",            color: "#ec4899", bg: "#ec489915" },
-  { href: "/groceries",   icon: <MdOutlineShoppingCart size={28} />, en: "Groceries",         ar: "البقالة",            color: "#22c55e", bg: "#22c55e15" },
-  { href: "/beauty",      icon: <MdOutlineSpa size={28} />,          en: "Beauty",            ar: "التجميل",            color: "#a855f7", bg: "#a855f715" },
-  { href: "/household",   icon: <MdOutlineChair size={28} />,        en: "Household",         ar: "المستلزمات المنزلية", color: "#f0a500", bg: "#f0a50015" },
-  { href: "/accessories", icon: <MdOutlineDiamond size={28} />,      en: "Accessories",       ar: "الإكسسوارات",        color: "#14b8a6", bg: "#14b8a615" },
+  { cat: "electronics", icon: <MdDevices size={28} />,            en: "Electronics",  ar: "الإلكترونيات",       color: "#3b82f6", bg: "#3b82f615" },
+  { cat: "fashion",     icon: <MdOutlineCheckroom size={28} />,   en: "Fashion",      ar: "الأزياء",            color: "#ec4899", bg: "#ec489915" },
+  { cat: "groceries",   icon: <MdOutlineShoppingCart size={28} />, en: "Groceries",   ar: "البقالة",            color: "#22c55e", bg: "#22c55e15" },
+  { cat: "beauty",      icon: <MdOutlineSpa size={28} />,          en: "Beauty",      ar: "التجميل",            color: "#a855f7", bg: "#a855f715" },
+  { cat: "household",   icon: <MdOutlineChair size={28} />,        en: "Household",   ar: "المستلزمات المنزلية", color: "#f0a500", bg: "#f0a50015" },
+  { cat: "accessories", icon: <MdOutlineDiamond size={28} />,      en: "Accessories", ar: "الإكسسوارات",        color: "#14b8a6", bg: "#14b8a615" },
 ];
 
 export default function CategoryGrid() {
@@ -29,7 +29,7 @@ export default function CategoryGrid() {
             {isAR ? "تسوق حسب الفئة" : "Shop by Category"}
           </h2>
         </div>
-        <Link href="/categories" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#f0a500]/40 text-xs sm:text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white hover:border-[#f0a500] transition-all shrink-0">
+        <Link href="/products" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#f0a500]/40 text-xs sm:text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white hover:border-[#f0a500] transition-all shrink-0">
           {isAR ? "عرض الكل" : "View All"}
         </Link>
       </div>
@@ -38,8 +38,8 @@ export default function CategoryGrid() {
       <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {categories.map((cat) => (
           <Link
-            key={cat.href}
-            href={cat.href}
+            key={cat.en}
+            href={`/products?cat=${cat.cat}`}
             className="group flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-[#13112a] hover:border-[#f0a500]/40 hover:shadow-lg hover:shadow-[#f0a500]/5 transition-all duration-200"
           >
             <div

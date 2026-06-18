@@ -9,13 +9,22 @@ import { useCurrency } from "../../context/CurrencyContext";
 
 const slides = [
   {
+    imgSrc:  "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400&q=85",
+    imgAlt:  "Shop now",
+    badge:   { en: "Welcome",          ar: "مرحباً بك"          },
+    heading: { en: "Everything You Need\nIn One Place",         ar: "كل ما تحتاجه\nفي مكان واحد"          },
+    sub:     { en: "Explore thousands of premium products across all categories. Fast delivery, great prices.", ar: "استكشف آلاف المنتجات المميزة في جميع الفئات. توصيل سريع وأسعار رائعة." },
+    cta:     { en: "Shop Now",         ar: "تسوق الآن"          },
+    href:    "/products",
+  },
+  {
     imgSrc:  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&q=85",
     imgAlt:  "Shop electronics",
     badge:   { en: "New Arrivals",     ar: "وصل حديثاً"        },
     heading: { en: "Premium Electronics\nFor Every Budget",     ar: "إلكترونيات مميزة\nلكل ميزانية"        },
     sub:     { en: "Fast delivery across Africa & the Middle East. Shop the latest tech today.", ar: "توصيل سريع عبر أفريقيا والشرق الأوسط. تسوق أحدث التقنية اليوم." },
     cta:     { en: "Shop Electronics", ar: "تسوق الإلكترونيات" },
-    href:    "/electronics",
+    href:    "/products?cat=electronics",
   },
   {
     imgSrc:  "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=85",
@@ -24,7 +33,7 @@ const slides = [
     heading: { en: "Trending Fashion\nEvery Week",              ar: "أزياء رائجة\nكل أسبوع"              },
     sub:     { en: "Discover exclusive styles from top designers. New collections every week.", ar: "اكتشف أناقة حصرية من أشهر المصممين. مجموعات جديدة كل أسبوع." },
     cta:     { en: "Shop Fashion",     ar: "تسوق الأزياء"       },
-    href:    "/fashion",
+    href:    "/products?cat=fashion",
   },
   {
     imgSrc:  "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400&q=85",
@@ -33,7 +42,7 @@ const slides = [
     heading: { en: "Up to 60% Off\nTop Products",               ar: "خصم يصل إلى 60%\nعلى أفضل المنتجات"  },
     sub:     { en: "Limited time deals on electronics, fashion, beauty and more. Don't miss out.", ar: "عروض محدودة على الإلكترونيات والأزياء والتجميل وأكثر. لا تفوتك." },
     cta:     { en: "See All Deals",    ar: "عرض كل الصفقات"     },
-    href:    "/deals",
+    href:    "/products",
   },
 ];
 
@@ -184,7 +193,7 @@ export default function HeroBanner() {
                   {isAR ? <FiArrowLeft size={14} /> : <FiArrowRight size={14} />}
                 </Link>
                 <Link
-                  href="/deals"
+                  href="/products"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white bg-white/10 border border-white/50 hover:bg-white/20 hover:border-white/80 transition-all whitespace-nowrap z-10 backdrop-blur-sm"
                 >
                   {isAR ? "كل العروض" : "All Deals"}

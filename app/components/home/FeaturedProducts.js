@@ -4,17 +4,7 @@ import Link from "next/link";
 import { FiArrowRight, FiArrowLeft } from "react-icons/fi";
 import { useLang } from "../../context/LangContext";
 import ProductCard from "./ProductCard";
-
-const products = [
-  { id: 1, name: "Wireless Noise-Cancelling Headphones", nameAR: "سماعات لاسلكية بإلغاء الضوضاء", brand: "SoundPro",  emoji: "🎧", price: 79,  originalPrice: 120,  rating: 4, reviews: 312, isNew: false, cat: "electronics" },
-  { id: 2, name: "4K Ultra Smart TV 55\"",               nameAR: "تلفاز ذكي 4K فائق الدقة 55\"",  brand: "VisionX",   emoji: "📺", price: 349, originalPrice: 499,  rating: 5, reviews: 187, isNew: false, cat: "electronics" },
-  { id: 3, name: "Designer Linen Shirt",                  nameAR: "قميص كتان مصمم",                 brand: "UrbanEdge", emoji: "👔", price: 45,  originalPrice: null, rating: 4, reviews: 95,  isNew: true,  cat: "fashion"     },
-  { id: 4, name: "Premium Running Sneakers",              nameAR: "حذاء رياضي فاخر للجري",          brand: "SwiftStep", emoji: "👟", price: 89,  originalPrice: 130,  rating: 5, reviews: 422, isNew: false, cat: "fashion"     },
-  { id: 5, name: "Vitamin C Brightening Serum",           nameAR: "سيروم فيتامين C المضيء",         brand: "GlowLab",   emoji: "💆", price: 35,  originalPrice: 55,   rating: 4, reviews: 210, isNew: true,  cat: "beauty"      },
-  { id: 6, name: "Organic Face Moisturizer",              nameAR: "مرطب وجه عضوي",                  brand: "PureGlow",  emoji: "🧴", price: 28,  originalPrice: null, rating: 4, reviews: 143, isNew: false, cat: "beauty"      },
-  { id: 7, name: "Smart Robot Vacuum Cleaner",            nameAR: "مكنسة روبوتية ذكية",             brand: "CleanBot",  emoji: "🤖", price: 199, originalPrice: 299,  rating: 5, reviews: 88,  isNew: false, cat: "household"   },
-  { id: 8, name: "Stainless Steel Cookware Set",          nameAR: "طقم أواني طهي من الستانلس ستيل", brand: "ChefPlus",  emoji: "🍳", price: 115, originalPrice: 160,  rating: 4, reviews: 76,  isNew: true,  cat: "household"   },
-];
+import { products } from "../../data/products";
 
 const tabs = [
   { key: "all",         en: "All",         ar: "الكل"          },
@@ -22,6 +12,8 @@ const tabs = [
   { key: "fashion",     en: "Fashion",     ar: "الأزياء"        },
   { key: "beauty",      en: "Beauty",      ar: "التجميل"        },
   { key: "household",   en: "Household",   ar: "المنزل"         },
+  { key: "groceries",   en: "Groceries",   ar: "البقالة"         },
+  { key: "accessories", en: "Accessories", ar: "الإكسسوارات"    },
 ];
 
 export default function FeaturedProducts() {
