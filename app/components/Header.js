@@ -578,7 +578,7 @@ export default function Header() {
                 <div className={`absolute left-0 mt-2 w-40 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-[999]`}>
                   {languages.map(l => (
                     <button key={l.code}
-                      onMouseDown={(e) => { e.preventDefault(); setLang(l.code); setLangOpen(false); }}
+                      onMouseDown={(e) => { e.preventDefault(); setLang(l.code); setLangOpen(false); setMenuOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm cursor-pointer transition-colors
                         ${lang === l.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <Image src={l.flag} alt={l.native} width={20} height={14} className="rounded-sm object-cover shrink-0" style={{ width: "20px", height: "auto" }} />
@@ -601,7 +601,7 @@ export default function Header() {
               {currencyOpen && (
                 <div className={`absolute left-0 mt-2 w-48 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-50`}>
                   {currencies.map(c => (
-                    <button key={c.code} onMouseDown={(e) => { e.preventDefault(); setCurrency(c.code); setCurrencyOpen(false); }}
+                    <button key={c.code} onMouseDown={(e) => { e.preventDefault(); setCurrency(c.code); setCurrencyOpen(false); setMenuOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm cursor-pointer transition-colors
                         ${currency === c.code ? "bg-[#f0a500]/10 text-[#f0a500] font-semibold" : `${navTxt} hover:bg-[#f0a500]/5 hover:text-[#f0a500]`}`}>
                       <span className="w-7 font-bold text-[#f0a500] shrink-0 text-sm">{c.sign}</span>

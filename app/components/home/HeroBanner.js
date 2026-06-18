@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight, FiArrowLeft, FiStar } from "react-icons/fi";
@@ -113,7 +113,19 @@ export default function HeroBanner() {
   const [current,   setCurrent]   = useState(0);
   const [activeTab, setActiveTab] = useState("featured");
   const [headerH,   setHeaderH]   = useState(140);
+  const tabsRef = useRef(null);
   const slide = slides[current];
+
+  function handleTabClick(key) {
+    setActiveTab(key);
+    // scroll the clicked tab to center
+    const container = tabsRef.current;
+    const btn = container?.querySelector(`[data-tab="${key}"]`);
+    if (container && btn) {
+      const offset = btn.offsetLeft - container.offsetWidth / 2 + btn.offsetWidth / 2;
+      container.scrollTo({ left: offset, behavior: "smooth" });
+    }
+  }
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), []);
 
@@ -231,11 +243,12 @@ export default function HeroBanner() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
 
           {/* Tabs */}
-          <div className="flex items-center border-b border-gray-100 dark:border-white/5 overflow-x-auto scrollbar-none">
+          <div ref={tabsRef} className="flex items-center border-b border-gray-100 dark:border-white/5 overflow-x-auto scrollbar-none">
             {stripTabs.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
+                data-tab={tab.key}
+                onClick={() => handleTabClick(tab.key)}
                 className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap border-b-2 -mb-px transition-all duration-200 cursor-pointer ${
                   activeTab === tab.key
                     ? "border-[#f0a500] text-[#f0a500]"
