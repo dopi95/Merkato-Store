@@ -2,10 +2,12 @@
 import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FiHeart, FiShoppingBag, FiStar, FiSliders, FiX, FiChevronDown } from "react-icons/fi";
+import { FiHeart, FiShoppingBag, FiStar, FiSliders, FiX, FiChevronDown, FiCheck } from "react-icons/fi";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { useLang } from "../../context/LangContext";
 import { useCurrency } from "../../context/CurrencyContext";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 import { products } from "../../data/products";
 
 const categories = [
@@ -41,12 +43,21 @@ function ShopPageInner() {
 
   const searchParams = useSearchParams();
 
+  const { addToCart } = useCart();
+  const { toggle: toggleWish, isWished } = useWishlist();
   const [search,   setSearch]   = useState("");
   const [cat,      setCat]      = useState("all");
   const [sort,     setSort]     = useState("featured");
   const [maxPrice, setMaxPrice] = useState(500);
   const [showFilters, setShowFilters] = useState(false);
-  const [wished,   setWished]   = useState({});
+  const [added,    setAdded]    = useState({});
+
+  function handleAddToCart(e, product) {
+    e.preventDefault();
+    addToCart(product, 1);
+    setAdded(a => ({ ...a, [product.id]: true }));
+    setTimeout(() => setAdded(a => ({ ...a, [product.id]: false })), 2000);
+  }
 
   useEffect(() => {
     const c = searchParams.get("cat");
@@ -73,8 +84,6 @@ function ShopPageInner() {
     if (sort === "newest")     list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
     return list;
   }, [cat, search, sort, maxPrice]);
-
-  const toggleWish = (id) => setWished(w => ({ ...w, [id]: !w[id] }));
 
   const nBg  = "bg-white dark:bg-[#13112a]";
   const br   = "border-gray-100 dark:border-white/5";
@@ -171,9 +180,9 @@ function ShopPageInner() {
                       {/* Wishlist */}
                       <button
                         onClick={(e) => { e.preventDefault(); toggleWish(product.id); }}
-                        className={`absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-sm flex items-center justify-center border ${br} hover:border-[#f0a500]/50 transition-all cursor-pointer shadow-sm`}
+                        className={`absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-sm flex items-center justify-center border ${br} hover:border-[#e05c5c]/50 transition-all cursor-pointer shadow-sm`}
                       >
-                        <FiHeart size={13} className={wished[product.id] ? "fill-[#e05c5c] text-[#e05c5c]" : "text-gray-400 dark:text-white/40"} />
+                        <FiHeart size={13} className={isWished(product.id) ? "fill-[#e05c5c] text-[#e05c5c]" : "text-gray-400 dark:text-white/40"} />
                       </button>
                       {/* Image */}
                       <div className="relative h-36 sm:h-44 bg-gray-50 dark:bg-[#0f0f1a] flex items-center justify-center overflow-hidden">
@@ -206,8 +215,15 @@ function ShopPageInner() {
                               </span>
                             )}
                           </div>
-                          <button onClick={(e) => e.preventDefault()} className="w-9 h-9 rounded-xl bg-[#f0a500]/10 hover:bg-[#f0a500] border border-[#f0a500]/30 hover:border-[#f0a500] text-[#f0a500] hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0">
-                            <FiShoppingBag size={14} />
+                          <button
+                            onClick={(e) => handleAddToCart(e, product)}
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
+                              added[product.id]
+                                ? "bg-[#22c55e] border border-[#22c55e] text-white"
+                                : "bg-[#f0a500]/10 hover:bg-[#f0a500] border border-[#f0a500]/30 hover:border-[#f0a500] text-[#f0a500] hover:text-white"
+                            }`}
+                          >
+                            {added[product.id] ? <FiCheck size={14} /> : <FiShoppingBag size={14} />}
                           </button>
                         </div>
                       </div>

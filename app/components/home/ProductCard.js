@@ -1,17 +1,29 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { FiHeart, FiShoppingBag, FiStar } from "react-icons/fi";
+import { FiHeart, FiShoppingBag, FiStar, FiCheck } from "react-icons/fi";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { useCurrency } from "../../context/CurrencyContext";
+import { useCart } from "../../context/CartContext";
+import { useWishlist } from "../../context/WishlistContext";
 
 export default function ProductCard({ product, isAR }) {
-  const [wished, setWished] = useState(false);
+  const [added, setAdded] = useState(false);
   const { convertPrice, sign } = useCurrency();
+  const { addToCart } = useCart();
+  const { toggle, isWished } = useWishlist();
+  const wished = isWished(product.id);
 
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : null;
+
+  function handleAddToCart(e) {
+    e.preventDefault();
+    addToCart(product, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  }
 
   return (
     <Link href={`/products/${product.id}`} className="group relative flex flex-col bg-white dark:bg-[#13112a] rounded-xl sm:rounded-2xl border border-gray-100 dark:border-white/5 overflow-hidden hover:shadow-xl hover:shadow-black/8 dark:hover:shadow-black/40 hover:border-[#f0a500]/30 transition-all duration-300">
@@ -32,8 +44,8 @@ export default function ProductCard({ product, isAR }) {
 
       {/* Wishlist */}
       <button
-        onClick={(e) => { e.preventDefault(); setWished(!wished); }}
-        className="absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-sm flex items-center justify-center border border-gray-100 dark:border-white/10 hover:border-[#f0a500]/50 transition-all cursor-pointer shadow-sm"
+        onClick={(e) => { e.preventDefault(); toggle(product.id); }}
+        className="absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 dark:bg-[#0d0d1a]/90 backdrop-blur-sm flex items-center justify-center border border-gray-100 dark:border-white/10 hover:border-[#e05c5c]/50 transition-all cursor-pointer shadow-sm"
       >
         <FiHeart size={13} className={wished ? "fill-[#e05c5c] text-[#e05c5c]" : "text-gray-400 dark:text-white/40"} />
       </button>
@@ -78,8 +90,15 @@ export default function ProductCard({ product, isAR }) {
               </span>
             )}
           </div>
-          <button onClick={(e) => e.preventDefault()} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-[#f0a500]/10 hover:bg-[#f0a500] border border-[#f0a500]/30 hover:border-[#f0a500] text-[#f0a500] hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0">
-            <FiShoppingBag size={14} />
+          <button
+            onClick={handleAddToCart}
+            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
+              added
+                ? "bg-[#22c55e] border border-[#22c55e] text-white"
+                : "bg-[#f0a500]/10 hover:bg-[#f0a500] border border-[#f0a500]/30 hover:border-[#f0a500] text-[#f0a500] hover:text-white"
+            }`}
+          >
+            {added ? <FiCheck size={14} /> : <FiShoppingBag size={14} />}
           </button>
         </div>
       </div>

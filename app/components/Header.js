@@ -8,6 +8,8 @@ import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiChevronDown, FiChevron
 import { MdDevices, MdOutlineCheckroom, MdOutlineShoppingCart, MdOutlineSpa, MdOutlineChair, MdOutlineDiamond, MdOutlineInfo, MdOutlinePhone, MdOutlineHelpOutline } from "react-icons/md";
 import { useLang } from "../context/LangContext";
 import { useCurrency, currencies } from "../context/CurrencyContext";
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 import { products } from "../data/products";
 
 const navLinksEN = [
@@ -57,6 +59,8 @@ export default function Header() {
   const [query,        setQuery]        = useState("");
   const [showResults,  setShowResults]  = useState(false);
   const [activeCat,    setActiveCat]    = useState(null);
+  const { totalItems } = useCart();
+  const { count: wishCount } = useWishlist();
   const searchRef = useRef(null);
   const navRef    = useRef(null);
 
@@ -241,11 +245,12 @@ export default function Header() {
 
           <Link href="/wishlist" className={`relative p-2 ${muted} hover:text-[#f0a500] transition-colors`} aria-label="Wishlist">
             <FiHeart size={20} />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] rounded-full bg-[#e05c5c] text-white text-[9px] font-bold flex items-center justify-center px-0.5 leading-none pointer-events-none">{wishCount > 99 ? "99+" : wishCount}</span>
           </Link>
 
           <Link href="/cart" className={`relative p-2 ${muted} hover:text-[#f0a500] transition-colors`} aria-label="Cart">
             <FiShoppingBag size={20} />
-            <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#f0a500] text-white text-[10px] font-bold flex items-center justify-center">0</span>
+            <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] rounded-full bg-[#f0a500] text-white text-[9px] font-bold flex items-center justify-center px-0.5 leading-none pointer-events-none">{totalItems > 99 ? "99+" : totalItems}</span>
           </Link>
 
           {/* User dropdown — desktop */}
