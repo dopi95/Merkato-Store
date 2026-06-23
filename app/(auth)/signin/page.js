@@ -6,7 +6,9 @@ import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook, BsShieldCheck, BsTruck, BsHeadset } from "react-icons/bs";
 import { useLang } from "../../context/LangContext";
+import { useAuth } from "../../context/AuthContext";
 import AuthSlider from "../../components/AuthSlider";
+import { useRouter } from "next/navigation";
 
 const T = {
   en: {
@@ -47,6 +49,8 @@ const T = {
 
 export default function SignInPage() {
   const { lang } = useLang();
+  const { login } = useAuth();
+  const router = useRouter();
   const isAR = lang === "ar";
   const c = T[isAR ? "ar" : "en"];
 
@@ -58,7 +62,10 @@ export default function SignInPage() {
   function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
+    setTimeout(() => {
+      login();
+      router.push("/dashboard");
+    }, 1000);
   }
 
   const field = "flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 focus-within:border-[#f0a500] focus-within:bg-white dark:focus-within:bg-white/8 transition-all";
