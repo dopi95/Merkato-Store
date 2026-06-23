@@ -10,6 +10,7 @@ import { useLang } from "../context/LangContext";
 import { useCurrency, currencies } from "../context/CurrencyContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import { useAuth } from "../context/AuthContext";
 import { products } from "../data/products";
 
 const navLinksEN = [
@@ -61,6 +62,7 @@ export default function Header() {
   const [activeCat,    setActiveCat]    = useState(null);
   const { totalItems } = useCart();
   const { count: wishCount } = useWishlist();
+  const { user, logout, isLoggedIn } = useAuth();
   const searchRef = useRef(null);
   const navRef    = useRef(null);
 
@@ -263,7 +265,7 @@ export default function Header() {
               <FiUser size={18} />
               <span className="text-xs font-medium leading-tight text-left">
                 <span className="block text-[10px] opacity-60">{isAR ? "مرحباً" : "Welcome"}</span>
-                <span>{isAR ? "دخول / تسجيل" : "Sign in / Register"}</span>
+                <span>{isLoggedIn ? user.name.split(" ")[0] : (isAR ? "دخول / تسجيل" : "Sign in / Register")}</span>
               </span>
               <FiChevronDown size={13} style={{ transform: userOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
             </button>
@@ -272,14 +274,33 @@ export default function Header() {
                 className={`absolute right-0 mt-2 w-48 rounded-xl border ${br} ${nBg} shadow-lg overflow-hidden z-[999]`}
               >
                 <div className="px-3 py-3 flex flex-col gap-2">
-                  <button onMouseDown={() => { setUserOpen(false); router.push("/signin"); }}
-                    className={`block w-full text-center px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-sm ${navTxt} hover:border-[#f0a500] hover:text-[#f0a500] transition-colors cursor-pointer`}>
-                    {isAR ? "تسجيل الدخول" : "Sign In"}
-                  </button>
-                  <button onMouseDown={() => { setUserOpen(false); router.push("/register"); }}
-                    className="block w-full text-center px-4 py-2 rounded-full border border-[#f0a500] text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white transition-colors cursor-pointer">
-                    {isAR ? "إنشاء حساب" : "Register"}
-                  </button>
+                  {isLoggedIn ? (
+                    <>
+                      <div className="px-1 pb-2 border-b border-gray-100 dark:border-white/5">
+                        <p className="text-xs font-bold text-gray-800 dark:text-white truncate">{user.name}</p>
+                        <p className="text-[10px] text-gray-400 dark:text-white/30 truncate">{user.email}</p>
+                      </div>
+                      <button onMouseDown={() => { setUserOpen(false); router.push("/dashboard"); }}
+                        className={`block w-full text-center px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-sm ${navTxt} hover:border-[#f0a500] hover:text-[#f0a500] transition-colors cursor-pointer`}>
+                        {isAR ? "لوحة التحكم" : "Dashboard"}
+                      </button>
+                      <button onMouseDown={() => { setUserOpen(false); logout(); router.push("/"); }}
+                        className="block w-full text-center px-4 py-2 rounded-full border border-[#e05c5c]/40 text-sm font-semibold text-[#e05c5c] hover:bg-[#e05c5c] hover:text-white transition-colors cursor-pointer">
+                        {isAR ? "تسجيل الخروج" : "Log Out"}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onMouseDown={() => { setUserOpen(false); router.push("/signin"); }}
+                        className={`block w-full text-center px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-sm ${navTxt} hover:border-[#f0a500] hover:text-[#f0a500] transition-colors cursor-pointer`}>
+                        {isAR ? "تسجيل الدخول" : "Sign In"}
+                      </button>
+                      <button onMouseDown={() => { setUserOpen(false); router.push("/register"); }}
+                        className="block w-full text-center px-4 py-2 rounded-full border border-[#f0a500] text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white transition-colors cursor-pointer">
+                        {isAR ? "إنشاء حساب" : "Register"}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -554,14 +575,21 @@ export default function Header() {
             </button>
             {userOpen && (
               <div className={`mt-1 rounded-xl border ${br} ${nBg} px-3 py-3 flex flex-col gap-2`}>
-                <button onClick={() => { setMenuOpen(false); setUserOpen(false); setTimeout(() => router.push("/signin"), 10); }}
+                <button onClick={() => { setMenuOpen(false); setUserOpen(false); setTimeout(() => router.push(isLoggedIn ? "/dashboard" : "/signin"), 10); }}
                   className={`w-full text-center px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-sm ${navTxt} hover:border-[#f0a500] hover:text-[#f0a500] transition-colors`}>
-                  {isAR ? "تسجيل الدخول" : "Sign In"}
+                  {isLoggedIn ? (isAR ? "لوحة التحكم" : "Dashboard") : (isAR ? "تسجيل الدخول" : "Sign In")}
                 </button>
-                <button onClick={() => { setMenuOpen(false); setUserOpen(false); setTimeout(() => router.push("/register"), 10); }}
-                  className="w-full text-center px-4 py-2 rounded-full border border-[#f0a500] text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white transition-colors">
-                  {isAR ? "إنشاء حساب" : "Register"}
-                </button>
+                {isLoggedIn ? (
+                  <button onClick={() => { setMenuOpen(false); logout(); router.push("/"); }}
+                    className="w-full text-center px-4 py-2 rounded-full border border-[#e05c5c]/40 text-sm font-semibold text-[#e05c5c] hover:bg-[#e05c5c] hover:text-white transition-colors">
+                    {isAR ? "تسجيل الخروج" : "Log Out"}
+                  </button>
+                ) : (
+                  <button onClick={() => { setMenuOpen(false); setUserOpen(false); setTimeout(() => router.push("/register"), 10); }}
+                    className="w-full text-center px-4 py-2 rounded-full border border-[#f0a500] text-sm font-semibold text-[#f0a500] hover:bg-[#f0a500] hover:text-white transition-colors">
+                    {isAR ? "إنشاء حساب" : "Register"}
+                  </button>
+                )}
               </div>
             )}
           </div>
