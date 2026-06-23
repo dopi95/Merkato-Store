@@ -3,6 +3,7 @@ import { LangProvider } from "./LangContext";
 import { CurrencyProvider } from "./CurrencyContext";
 import { CartProvider } from "./CartContext";
 import { WishlistProvider } from "./WishlistContext";
+import { AuthProvider } from "./AuthContext";
 
 export default function Providers({ children }) {
   return (
@@ -10,7 +11,9 @@ export default function Providers({ children }) {
       <CurrencyProvider>
         <CartProvider>
           <WishlistProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </WishlistProvider>
         </CartProvider>
       </CurrencyProvider>
