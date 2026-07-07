@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { FiUser, FiMail, FiLock, FiPhone, FiEye, FiEyeOff, FiArrowRight, FiCheck } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiCheck } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
-import { BsFacebook, BsShieldCheck, BsTruck, BsHeadset, BsGift } from "react-icons/bs";
+import { BsShieldCheck, BsTruck, BsHeadset, BsGift } from "react-icons/bs";
 import { useLang } from "../../context/LangContext";
 import AuthSlider from "../../components/AuthSlider";
 
@@ -15,7 +15,7 @@ const T = {
     phone: "Phone", phonePh: "+1 234 567 8900",
     password: "Password", confirm: "Confirm password",
     terms: "I agree to the", termsLink: "Terms", and: "&", privacyLink: "Privacy Policy",
-    btn: "Create Account", or: "or sign up with", google: "Google", facebook: "Facebook",
+    btn: "Create Account", or: "or sign up with", google: "Google",
     hasAccount: "Already have an account?", signin: "Sign in",
     backHome: "Back to Home",
     strength: ["", "Weak", "Fair", "Good", "Strong"],
@@ -36,7 +36,7 @@ const T = {
     phone: "الهاتف", phonePh: "+966 5XX XXX XXXX",
     password: "كلمة المرور", confirm: "تأكيد كلمة المرور",
     terms: "أوافق على", termsLink: "الشروط", and: "و", privacyLink: "سياسة الخصوصية",
-    btn: "إنشاء الحساب", or: "أو سجّل بـ", google: "Google", facebook: "Facebook",
+    btn: "إنشاء الحساب", or: "أو سجّل بـ", google: "Google",
     hasAccount: "لديك حساب؟", signin: "تسجيل الدخول",
     backHome: "العودة للرئيسية",
     strength: ["", "ضعيف", "متوسط", "جيد", "قوي"],
@@ -69,7 +69,7 @@ export default function RegisterPage() {
   const isAR = lang === "ar";
   const c = T[isAR ? "ar" : "en"];
 
-  const [form, setForm]       = useState({ name: "", email: "", phone: "", password: "", confirm: "" });
+  const [form, setForm]       = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw, setShowPw]   = useState(false);
   const [showCf, setShowCf]   = useState(false);
   const [agreed, setAgreed]   = useState(false);
@@ -117,9 +117,6 @@ export default function RegisterPage() {
               <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white/70 text-sm font-medium hover:border-[#f0a500]/50 hover:bg-[#f0a500]/5 transition-all cursor-pointer">
                 <FcGoogle size={15} /> {c.google}
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-[#1877f2] text-sm font-medium hover:border-[#1877f2]/40 hover:bg-[#1877f2]/5 transition-all cursor-pointer">
-                <BsFacebook size={15} /> {c.facebook}
-              </button>
             </div>
 
             <div className="flex items-center gap-2 mb-3">
@@ -130,21 +127,12 @@ export default function RegisterPage() {
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
 
-              {/* Name + Phone */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className={lbl}>{c.fullName}</label>
-                  <div className={`${field} border-gray-200 dark:border-white/10`}>
-                    <FiUser size={13} className={ico} />
-                    <input type="text" required value={form.name} onChange={set("name")} placeholder={c.namePh} className={input} />
-                  </div>
-                </div>
-                <div>
-                  <label className={lbl}>{c.phone}</label>
-                  <div className={`${field} border-gray-200 dark:border-white/10`}>
-                    <FiPhone size={13} className={ico} />
-                    <input type="tel" value={form.phone} onChange={set("phone")} placeholder={c.phonePh} className={input} />
-                  </div>
+              {/* Name */}
+              <div>
+                <label className={lbl}>{c.fullName}</label>
+                <div className={`${field} border-gray-200 dark:border-white/10`}>
+                  <FiUser size={13} className={ico} />
+                  <input type="text" required value={form.name} onChange={set("name")} placeholder={c.namePh} className={input} />
                 </div>
               </div>
 

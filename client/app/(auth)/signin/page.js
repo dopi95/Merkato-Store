@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
-import { BsFacebook, BsShieldCheck, BsTruck, BsHeadset } from "react-icons/bs";
+import { BsShieldCheck, BsTruck, BsHeadset } from "react-icons/bs";
 import { useLang } from "../../context/LangContext";
 import { useAuth } from "../../context/AuthContext";
 import AuthSlider from "../../components/AuthSlider";
@@ -16,7 +16,7 @@ const T = {
     email: "Email", emailPh: "you@example.com",
     password: "Password", passwordPh: "••••••••",
     forgot: "Forgot password?", btn: "Sign In",
-    or: "or continue with", google: "Google", facebook: "Facebook",
+    or: "or continue with", google: "Google",
     noAccount: "Don't have an account?", register: "Create one",
     backHome: "Back to Home",
     tagline: "Your premium marketplace across Africa & the Middle East.",
@@ -33,7 +33,7 @@ const T = {
     email: "البريد الإلكتروني", emailPh: "you@example.com",
     password: "كلمة المرور", passwordPh: "••••••••",
     forgot: "نسيت كلمة المرور؟", btn: "تسجيل الدخول",
-    or: "أو تابع بـ", google: "Google", facebook: "Facebook",
+    or: "أو تابع بـ", google: "Google",
     noAccount: "ليس لديك حساب؟", register: "أنشئ حساباً",
     backHome: "العودة للرئيسية",
     tagline: "سوقك المميز عبر أفريقيا والشرق الأوسط.",
@@ -103,9 +103,6 @@ export default function SignInPage() {
             <div className="flex gap-2 mb-4">
               <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white/70 text-sm font-medium hover:border-[#f0a500]/50 hover:bg-[#f0a500]/5 transition-all cursor-pointer">
                 <FcGoogle size={15} /> {c.google}
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-[#1877f2] text-sm font-medium hover:border-[#1877f2]/40 hover:bg-[#1877f2]/5 transition-all cursor-pointer">
-                <BsFacebook size={15} /> {c.facebook}
               </button>
             </div>
 
