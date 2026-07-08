@@ -11,7 +11,9 @@ export default function AuthCallback() {
   useEffect(() => {
     const token = params.get("token");
     if (!token) { router.replace("/signin?error=google"); return; }
-    loginWithToken(token).then(() => router.replace("/dashboard"));
+    loginWithToken(token).then((user) => {
+      router.replace(user?.role === "admin" ? "/admin" : "/dashboard");
+    });
   }, []);
 
   return (

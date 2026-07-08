@@ -30,6 +30,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("merkato_token", token);
     const { data } = await axios.get(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
     setUser(data);
+    return data;
   }
 
   function logout() {
