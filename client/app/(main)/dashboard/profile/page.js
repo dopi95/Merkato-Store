@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
+import axios from "axios";
 import { FiUser, FiMail, FiPhone, FiCalendar, FiEdit2, FiCheck, FiCamera, FiLock, FiEye, FiEyeOff, FiShield } from "react-icons/fi";
 import { useAuth } from "../../../context/AuthContext";
 import { useLang } from "../../../context/LangContext";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 function pwStrength(pw) {
   let s = 0;
@@ -14,51 +17,79 @@ function pwStrength(pw) {
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { lang } = useLang();
   const isAR = lang === "ar";
 
-  // Profile state
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing]       = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [saving, setSaving]         = useState(false);
   const [form, setForm] = useState({
-    name:   user.name,
-    email:  user.email,
-    phone:  user.phone,
-    dob:    user.dob,
-    gender: user.gender,
+    name:   user.name   || "",
+    phone:  user.phone  || "",
+    dob:    user.dob    || "",
+    gender: user.gender || "",
   });
 
-  // Password state
   const [pw, setPw]         = useState({ current: "", next: "", confirm: "" });
   const [show, setShow]     = useState({ current: false, next: false, confirm: false });
   const [pwSaved, setPwSaved]   = useState(false);
+  const [pwError, setPwError]   = useState("");
   const [pwErrors, setPwErrors] = useState({});
+  const [pwLoading, setPwLoading] = useState(false);
 
-  function handleProfileSave(e) {
+  async function handleProfileSave(e) {
     e.preventDefault();
-    setEditing(false);
-    setProfileSaved(true);
-    setTimeout(() => setProfileSaved(false), 3000);
+    setSaving(true);
+    setProfileError("");
+    try {
+      const token = localStorage.getItem("merkato_token");
+      const { data } = await axios.put(`${API}/auth/profile`, form, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      updateUser(data);
+      setEditing(false);
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 3000);
+    } catch (err) {
+      setProfileError(err.response?.data?.message || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function handlePwSubmit(e) {
+  async function handlePwSubmit(e) {
     e.preventDefault();
     const errs = {};
-    if (!pw.current)              errs.current = true;
-    if (pw.next.length < 8)       errs.next = true;
-    if (pw.next !== pw.confirm)   errs.confirm = true;
+    if (!pw.current)            errs.current = true;
+    if (pw.next.length < 8)     errs.next = true;
+    if (pw.next !== pw.confirm) errs.confirm = true;
     if (Object.keys(errs).length) { setPwErrors(errs); return; }
     setPwErrors({});
-    setPwSaved(true);
-    setPw({ current: "", next: "", confirm: "" });
-    setTimeout(() => setPwSaved(false), 3500);
+    setPwError("");
+    setPwLoading(true);
+    try {
+      const token = localStorage.getItem("merkato_token");
+      await axios.put(`${API}/auth/change-password`,
+        { currentPassword: pw.current, newPassword: pw.next },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setPwSaved(true);
+      setPw({ current: "", next: "", confirm: "" });
+      setTimeout(() => setPwSaved(false), 3500);
+    } catch (err) {
+      setPwError(err.response?.data?.message || "Failed to change password");
+    } finally {
+      setPwLoading(false);
+    }
   }
 
-  const nBg  = "bg-white dark:bg-[#13112a]";
-  const br   = "border-gray-100 dark:border-white/5";
+  const nBg   = "bg-white dark:bg-[#13112a]";
+  const br    = "border-gray-100 dark:border-white/5";
   const muted = "text-gray-500 dark:text-white/50";
-  const initials = form.name.split(" ").map(n => n[0]).join("").toUpperCase();
+  const initials = (user.name || "?").split(" ").map(n => n[0]).join("").toUpperCase();
+  const memberSince = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—";
 
   const str = pwStrength(pw.next);
   const strLabel = ["", isAR ? "ضعيفة" : "Weak", isAR ? "متوسطة" : "Fair", isAR ? "جيدة" : "Good", isAR ? "قوية" : "Strong"][str];
@@ -117,7 +148,7 @@ export default function ProfilePage() {
           ) : (
             <div className="flex gap-2">
               <button
-                onClick={() => setEditing(false)}
+                onClick={() => { setEditing(false); setProfileError(""); }}
                 className={`px-4 py-2 rounded-xl border ${br} text-sm font-semibold ${muted} hover:border-gray-300 transition-colors cursor-pointer`}
               >
                 {isAR ? "إلغاء" : "Cancel"}
@@ -125,9 +156,10 @@ export default function ProfilePage() {
               <button
                 form="profile-form"
                 type="submit"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#f0a500] hover:bg-[#c97000] text-white text-sm font-bold transition-colors cursor-pointer"
+                disabled={saving}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#f0a500] hover:bg-[#c97000] text-white text-sm font-bold transition-colors cursor-pointer disabled:opacity-60"
               >
-                <FiCheck size={14} /> {isAR ? "حفظ" : "Save"}
+                <FiCheck size={14} /> {saving ? (isAR ? "جاري الحفظ..." : "Saving...") : (isAR ? "حفظ" : "Save")}
               </button>
             </div>
           )}
@@ -136,9 +168,10 @@ export default function ProfilePage() {
         {/* Avatar */}
         <div className="flex items-center gap-4 mb-6">
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-[#f0a500]/30">
-              {initials}
-            </div>
+            {user.picture
+              ? <img src={user.picture} alt={user.name} referrerPolicy="no-referrer" className="w-20 h-20 rounded-full object-cover shadow-lg" />
+              : <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-[#f0a500]/30">{initials}</div>
+            }
             {editing && (
               <button className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#f0a500] text-white flex items-center justify-center shadow-md cursor-pointer hover:bg-[#c97000] transition-colors">
                 <FiCamera size={12} />
@@ -146,9 +179,9 @@ export default function ProfilePage() {
             )}
           </div>
           <div>
-            <p className="font-bold text-gray-800 dark:text-white">{form.name}</p>
-            <p className={`text-sm ${muted}`}>{form.email}</p>
-            <p className={`text-xs ${muted} mt-0.5`}>{isAR ? `عضو منذ ${user.joined}` : `Member since ${user.joined}`}</p>
+            <p className="font-bold text-gray-800 dark:text-white">{user.name}</p>
+            <p className={`text-sm ${muted}`}>{user.email}</p>
+            <p className={`text-xs ${muted} mt-0.5`}>{isAR ? `عضو منذ ${memberSince}` : `Member since ${memberSince}`}</p>
           </div>
         </div>
 
@@ -158,14 +191,18 @@ export default function ProfilePage() {
             {isAR ? "تم حفظ التغييرات بنجاح!" : "Changes saved successfully!"}
           </div>
         )}
+        {profileError && (
+          <div className="px-4 py-2.5 rounded-xl bg-[#e05c5c]/10 border border-[#e05c5c]/20 text-[#e05c5c] text-sm font-semibold mb-4">
+            {profileError}
+          </div>
+        )}
 
         <form id="profile-form" onSubmit={handleProfileSave}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { icon: FiUser,     key: "name",  en: "Full Name",     ar: "الاسم الكامل",        type: "text"  },
-              { icon: FiMail,     key: "email", en: "Email",         ar: "البريد الإلكتروني",   type: "email" },
-              { icon: FiPhone,    key: "phone", en: "Phone",         ar: "رقم الهاتف",          type: "tel"   },
-              { icon: FiCalendar, key: "dob",   en: "Date of Birth", ar: "تاريخ الميلاد",       type: "date"  },
+              { icon: FiUser,     key: "name",  en: "Full Name",     ar: "الاسم الكامل",       type: "text" },
+              { icon: FiPhone,    key: "phone", en: "Phone",         ar: "رقم الهاتف",         type: "tel"  },
+              { icon: FiCalendar, key: "dob",   en: "Date of Birth", ar: "تاريخ الميلاد",      type: "date" },
             ].map(({ icon: Icon, key, en, ar, type }) => (
               <div key={key}>
                 <label className={`block text-xs font-semibold ${muted} mb-1.5`}>{isAR ? ar : en}</label>
@@ -183,6 +220,15 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+
+            {/* Email — read-only */}
+            <div>
+              <label className={`block text-xs font-semibold ${muted} mb-1.5`}>{isAR ? "البريد الإلكتروني" : "Email"}</label>
+              <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border border-transparent text-sm bg-gray-50 dark:bg-[#0f0f1a]`}>
+                <FiMail size={14} className={`shrink-0 ${muted}`} />
+                <span className={`flex-1 text-sm ${muted}`}>{user.email}</span>
+              </div>
+            </div>
 
             <div>
               <label className={`block text-xs font-semibold ${muted} mb-1.5`}>{isAR ? "الجنس" : "Gender"}</label>
@@ -219,9 +265,9 @@ export default function ProfilePage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { en: "Account Type",   ar: "نوع الحساب",   val: isAR ? "عميل" : "Customer" },
-            { en: "Member Since",   ar: "عضو منذ",      val: user.joined },
-            { en: "Account Status", ar: "حالة الحساب",  val: isAR ? "نشط ✓" : "Active ✓" },
+            { en: "Account Type",   ar: "نوع الحساب",  val: isAR ? "عميل" : "Customer" },
+            { en: "Member Since",   ar: "عضو منذ",     val: memberSince },
+            { en: "Account Status", ar: "حالة الحساب", val: isAR ? "نشط ✓" : "Active ✓" },
           ].map((item, i) => (
             <div key={i} className="flex flex-col gap-1 p-3 rounded-xl bg-gray-50 dark:bg-[#0f0f1a]">
               <p className={`text-[10px] font-bold uppercase tracking-widest ${muted}`}>{isAR ? item.ar : item.en}</p>
@@ -248,6 +294,11 @@ export default function ProfilePage() {
             {isAR ? "تم تغيير كلمة المرور بنجاح!" : "Password changed successfully!"}
           </div>
         )}
+        {pwError && (
+          <div className="px-4 py-3 rounded-xl bg-[#e05c5c]/10 border border-[#e05c5c]/20 text-[#e05c5c] text-sm font-semibold mb-5">
+            {pwError}
+          </div>
+        )}
 
         <form onSubmit={handlePwSubmit} className="flex flex-col gap-4 max-w-lg">
           <PwField fkey="current" label={isAR ? "كلمة المرور الحالية" : "Current Password"} />
@@ -270,10 +321,10 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-2 gap-3 pt-1">
             {[
-              { en: "At least 8 characters",     ar: "8 أحرف على الأقل",        met: pw.next.length >= 8 },
-              { en: "Uppercase letter",           ar: "حرف كبير",                met: /[A-Z]/.test(pw.next) },
-              { en: "Number",                     ar: "رقم",                     met: /[0-9]/.test(pw.next) },
-              { en: "Special character (!@#$)",   ar: "رمز خاص (!@#$)",          met: /[^A-Za-z0-9]/.test(pw.next) },
+              { en: "At least 8 characters",   ar: "8 أحرف على الأقل",  met: pw.next.length >= 8 },
+              { en: "Uppercase letter",         ar: "حرف كبير",          met: /[A-Z]/.test(pw.next) },
+              { en: "Number",                   ar: "رقم",               met: /[0-9]/.test(pw.next) },
+              { en: "Special character (!@#$)", ar: "رمز خاص (!@#$)",    met: /[^A-Za-z0-9]/.test(pw.next) },
             ].map((tip, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className={`w-4 h-4 rounded-full flex items-center justify-center text-white shrink-0 ${tip.met ? "bg-[#22c55e]" : "bg-gray-200 dark:bg-white/10"}`}>
@@ -284,9 +335,9 @@ export default function ProfilePage() {
             ))}
           </div>
 
-          <button type="submit" className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#f0a500] hover:bg-[#c97000] text-white font-bold text-sm transition-colors cursor-pointer mt-1">
+          <button type="submit" disabled={pwLoading} className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#f0a500] hover:bg-[#c97000] text-white font-bold text-sm transition-colors cursor-pointer mt-1 disabled:opacity-60">
             <FiShield size={15} />
-            {isAR ? "تحديث كلمة المرور" : "Update Password"}
+            {pwLoading ? (isAR ? "جاري التحديث..." : "Updating...") : (isAR ? "تحديث كلمة المرور" : "Update Password")}
           </button>
         </form>
       </div>

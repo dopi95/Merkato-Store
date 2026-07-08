@@ -6,6 +6,10 @@ import { FcGoogle } from "react-icons/fc";
 import { BsShieldCheck, BsTruck, BsHeadset, BsGift } from "react-icons/bs";
 import { useLang } from "../../context/LangContext";
 import AuthSlider from "../../components/AuthSlider";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 const T = {
   en: {
@@ -54,11 +58,10 @@ const T = {
 
 function getStrength(pw) {
   if (!pw.length) return 0;
-  if (pw.length < 6) return 1;
+  if (pw.length < 8) return 1;
   let s = 1;
-  if (pw.length >= 8)          s++;
-  if (/[A-Z]/.test(pw))        s++;
-  if (/[0-9]/.test(pw))        s++;
+  if (/[A-Z]/.test(pw)) s++;
+  if (/[0-9]/.test(pw)) s++;
   if (/[^A-Za-z0-9]/.test(pw)) s++;
   return Math.min(s, 4);
 }
@@ -74,17 +77,27 @@ export default function RegisterPage() {
   const [showCf, setShowCf]   = useState(false);
   const [agreed, setAgreed]   = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+  const router = useRouter();
 
   const strength  = getStrength(form.password);
   const pwMatch   = form.confirm.length > 0 && form.password === form.confirm;
   const pwNoMatch = form.confirm.length > 0 && form.password !== form.confirm;
   const set = (f) => (e) => setForm((p) => ({ ...p, [f]: e.target.value }));
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!agreed) return;
+    if (!agreed || !pwMatch) return;
+    setError("");
     setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
+    try {
+      await axios.post(`${API}/auth/register`, { name: form.name, email: form.email, password: form.password });
+      router.push(`/check-email?email=${encodeURIComponent(form.email)}&type=verify`);
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const field = "flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-gray-50 dark:bg-white/5 focus-within:border-[#f0a500] focus-within:bg-white dark:focus-within:bg-white/8 transition-all";
@@ -114,7 +127,8 @@ export default function RegisterPage() {
 
             {/* Social */}
             <div className="flex gap-2 mb-3">
-              <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white/70 text-sm font-medium hover:border-[#f0a500]/50 hover:bg-[#f0a500]/5 transition-all cursor-pointer">
+              <button type="button" onClick={() => window.location.href = `${API}/auth/google`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white/70 text-sm font-medium hover:border-[#f0a500]/50 hover:bg-[#f0a500]/5 transition-all cursor-pointer">
                 <FcGoogle size={15} /> {c.google}
               </button>
             </div>
@@ -126,6 +140,7 @@ export default function RegisterPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
+              {error && <p className="text-xs text-red-500 text-center -mt-1">{error}</p>}
 
               {/* Name */}
               <div>
@@ -165,6 +180,19 @@ export default function RegisterPage() {
                     <span className="text-xs text-gray-400 dark:text-white/30 shrink-0">{c.strength[strength]}</span>
                   </div>
                 )}
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+                  {[
+                    [/.{8,}/, isAR ? "٨ أحرف" : "8+ chars"],
+                    [/[A-Z]/, isAR ? "حرف كبير" : "Uppercase"],
+                    [/[a-z]/, isAR ? "حرف صغير" : "Lowercase"],
+                    [/[0-9]/, isAR ? "رقم" : "Number"],
+                    [/[^A-Za-z0-9]/, isAR ? "رمز" : "Special"],
+                  ].map(([rx, label]) => (
+                    <span key={label} className={`text-[10px] font-medium transition-colors ${rx.test(form.password) ? "text-green-500" : "text-gray-400 dark:text-white/25"}`}>
+                      {rx.test(form.password) ? "✓" : "○"} {label}
+                    </span>
+                  ))}
+                </div>
               </div>
 
               {/* Confirm */}

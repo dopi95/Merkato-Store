@@ -5,6 +5,9 @@ import { FiMail, FiArrowRight, FiArrowLeft } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import AuthSlider from "../../components/AuthSlider";
 import { useLang } from "../../context/LangContext";
+import axios from "axios";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 const T = {
   en: {
@@ -33,14 +36,20 @@ export default function ForgotPasswordPage() {
 
   const [email, setEmail]   = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError]   = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await axios.post(`${API}/auth/forgot-password`, { email });
+      router.push("/check-email?email=" + encodeURIComponent(email) + "&type=reset");
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
       setLoading(false);
-      router.push("/check-email?email=" + encodeURIComponent(email));
-    }, 1500);
+    }
   }
 
   const field = "flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 focus-within:border-[#f0a500] focus-within:bg-white dark:focus-within:bg-white/8 transition-all";
@@ -74,6 +83,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {error && <p className="text-xs text-red-500 text-center">{error}</p>}
               <div>
                 <label className={lbl}>{c.email}</label>
                 <div className={field}>

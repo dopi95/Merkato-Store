@@ -1,10 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { FiLock, FiEye, FiEyeOff, FiArrowRight, FiArrowLeft, FiCheck } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthSlider from "../../components/AuthSlider";
 import { useLang } from "../../context/LangContext";
+import axios from "axios";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 const T = {
   en: {
@@ -35,21 +38,30 @@ const T = {
 
 function getStrength(pw) {
   if (!pw.length) return 0;
-  if (pw.length < 6) return 1;
+  if (pw.length < 8) return 1;
   let s = 1;
-  if (pw.length >= 8)          s++;
-  if (/[A-Z]/.test(pw))        s++;
-  if (/[0-9]/.test(pw))        s++;
+  if (/[A-Z]/.test(pw)) s++;
+  if (/[0-9]/.test(pw)) s++;
   if (/[^A-Za-z0-9]/.test(pw)) s++;
   return Math.min(s, 4);
 }
 const swColor = ["", "bg-red-500", "bg-orange-400", "bg-yellow-400", "bg-green-500"];
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function ResetPasswordContent() {
   const { lang } = useLang();
   const isAR = lang === "ar";
   const c = T[isAR ? "ar" : "en"];
   const router = useRouter();
+  const params = useSearchParams();
+  const token = params.get("token") || "";
 
   const [password, setPassword]   = useState("");
   const [confirm, setConfirm]     = useState("");
@@ -57,16 +69,25 @@ export default function ResetPasswordPage() {
   const [showCf, setShowCf]       = useState(false);
   const [loading, setLoading]     = useState(false);
   const [done, setDone]           = useState(false);
+  const [error, setError]         = useState("");
 
   const strength  = getStrength(password);
   const pwMatch   = confirm.length > 0 && password === confirm;
   const pwNoMatch = confirm.length > 0 && password !== confirm;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!pwMatch) return;
+    setError("");
     setLoading(true);
-    setTimeout(() => { setLoading(false); setDone(true); }, 1500);
+    try {
+      await axios.post(`${API}/auth/reset-password`, { token, password });
+      setDone(true);
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const field = "flex items-center gap-2 px-3 py-2.5 rounded-xl border bg-gray-50 dark:bg-white/5 focus-within:border-[#f0a500] focus-within:bg-white dark:focus-within:bg-white/8 transition-all";
@@ -116,6 +137,7 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+                  {error && <p className="text-xs text-red-500 text-center">{error}</p>}
                   {/* New password */}
                   <div>
                     <label className={lbl}>{c.newPw}</label>
@@ -137,6 +159,19 @@ export default function ResetPasswordPage() {
                         <span className="text-xs text-gray-400 dark:text-white/30 shrink-0">{c.strength[strength]}</span>
                       </div>
                     )}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+                      {[
+                        [/.{8,}/, isAR ? "٨ أحرف" : "8+ chars"],
+                        [/[A-Z]/, isAR ? "حرف كبير" : "Uppercase"],
+                        [/[a-z]/, isAR ? "حرف صغير" : "Lowercase"],
+                        [/[0-9]/, isAR ? "رقم" : "Number"],
+                        [/[^A-Za-z0-9]/, isAR ? "رمز" : "Special"],
+                      ].map(([rx, label]) => (
+                        <span key={label} className={`text-[10px] font-medium transition-colors ${rx.test(password) ? "text-green-500" : "text-gray-400 dark:text-white/25"}`}>
+                          {rx.test(password) ? "✓" : "○"} {label}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Confirm */}

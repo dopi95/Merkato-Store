@@ -58,14 +58,20 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw]     = useState(false);
   const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
-      login();
-      router.push("/dashboard");
-    }, 1000);
+    try {
+      const data = await login(email, password);
+      router.push(data.user.role === "admin" ? "/admin" : "/dashboard");
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const field = "flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 focus-within:border-[#f0a500] focus-within:bg-white dark:focus-within:bg-white/8 transition-all";
@@ -101,7 +107,8 @@ export default function SignInPage() {
 
             {/* Social */}
             <div className="flex gap-2 mb-4">
-              <button className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white/70 text-sm font-medium hover:border-[#f0a500]/50 hover:bg-[#f0a500]/5 transition-all cursor-pointer">
+              <button type="button" onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-white/70 text-sm font-medium hover:border-[#f0a500]/50 hover:bg-[#f0a500]/5 transition-all cursor-pointer">
                 <FcGoogle size={15} /> {c.google}
               </button>
             </div>
@@ -113,6 +120,7 @@ export default function SignInPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+              {error && <p className="text-xs text-red-500 text-center -mt-1">{error}</p>}
               <div>
                 <label className={lbl}>{c.email}</label>
                 <div className={field}>

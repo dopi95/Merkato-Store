@@ -51,9 +51,12 @@ export default function DashboardOverview() {
 
       {/* Welcome */}
       <div className={`${nBg} rounded-2xl border ${br} p-6 flex items-center gap-4`}>
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-xl shrink-0 shadow-lg shadow-[#f0a500]/30">
-          {user.name.split(" ").map(n => n[0]).join("")}
-        </div>
+        {user.picture
+          ? <img src={user.picture} alt={user.name} referrerPolicy="no-referrer" className="w-14 h-14 rounded-full object-cover shrink-0 shadow-lg" />
+          : <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-xl shrink-0 shadow-lg shadow-[#f0a500]/30">
+              {user.name.split(" ").map(n => n[0]).join("")}
+            </div>
+        }
         <div>
           <p className={`text-xs ${muted} mb-0.5`}>{isAR ? "مرحباً بك،" : "Welcome back,"}</p>
           <h1 className="text-xl font-extrabold text-gray-800 dark:text-white">{user.name} 👋</h1>

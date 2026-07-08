@@ -262,7 +262,9 @@ export default function Header() {
               onMouseEnter={() => setUserOpen(true)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${br} ${muted} hover:text-[#f0a500] hover:border-[#f0a500]/50 transition-colors cursor-pointer`}
             >
-              <FiUser size={18} />
+              {isLoggedIn && user.picture
+                ? <img src={user.picture} alt={user.name} className="w-6 h-6 rounded-full object-cover shrink-0" referrerPolicy="no-referrer" />
+                : <FiUser size={18} />}
               <span className="text-xs font-medium leading-tight text-left">
                 <span className="block text-[10px] opacity-60">{isAR ? "مرحباً" : "Welcome"}</span>
                 <span>{isLoggedIn ? user.name.split(" ")[0] : (isAR ? "دخول / تسجيل" : "Sign in / Register")}</span>

@@ -6,12 +6,17 @@ import { BsEnvelopeCheck } from "react-icons/bs";
 import { useState, Suspense } from "react";
 import AuthSlider from "../../components/AuthSlider";
 import { useLang } from "../../context/LangContext";
+import axios from "axios";
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
 const T = {
   en: {
     title: "Check your email",
-    sub: "We sent a password reset link to",
-    sub2: "Check your inbox and click the link to reset your password.",
+    subVerify: "We sent a verification link to",
+    subReset: "We sent a password reset link to",
+    sub2Verify: "Check your inbox and click the link to verify your account.",
+    sub2Reset: "Check your inbox and click the link to reset your password.",
     resend: "Resend email", resending: "Resending...", resent: "Email resent!",
     backSignin: "Back to Sign In",
     backHome: "Back to Home",
@@ -19,8 +24,10 @@ const T = {
   },
   ar: {
     title: "تحقق من بريدك الإلكتروني",
-    sub: "أرسلنا رابط إعادة تعيين كلمة المرور إلى",
-    sub2: "افتح بريدك الإلكتروني وانقر على الرابط لإعادة تعيين كلمة المرور.",
+    subVerify: "أرسلنا رابط التحقق إلى",
+    subReset: "أرسلنا رابط إعادة تعيين كلمة المرور إلى",
+    sub2Verify: "افتح بريدك الإلكتروني وانقر على الرابط للتحقق من حسابك.",
+    sub2Reset: "افتح بريدك الإلكتروني وانقر على الرابط لإعادة تعيين كلمة المرور.",
     resend: "إعادة إرسال", resending: "جارٍ الإرسال...", resent: "تم الإرسال!",
     backSignin: "العودة لتسجيل الدخول",
     backHome: "العودة للرئيسية",
@@ -34,15 +41,21 @@ function CheckEmailContent() {
   const c = T[isAR ? "ar" : "en"];
   const params = useSearchParams();
   const email = params.get("email") || "your email";
+  const type = params.get("type") || "verify"; // "verify" | "reset"
+  const isVerify = type === "verify";
 
   const [status, setStatus] = useState("idle");
 
-  function handleResend() {
+  async function handleResend() {
     setStatus("sending");
-    setTimeout(() => {
+    try {
+      const endpoint = isVerify ? `${API}/auth/resend-verification` : `${API}/auth/forgot-password`;
+      await axios.post(endpoint, { email });
       setStatus("sent");
       setTimeout(() => setStatus("idle"), 3000);
-    }, 1500);
+    } catch {
+      setStatus("idle");
+    }
   }
 
   return (
@@ -68,9 +81,9 @@ function CheckEmailContent() {
 
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{c.title}</h2>
 
-            <p className="text-sm text-gray-400 dark:text-white/40 mb-1">{c.sub}</p>
+            <p className="text-sm text-gray-400 dark:text-white/40 mb-1">{isVerify ? c.subVerify : c.subReset}</p>
             <p className="text-sm font-semibold text-gray-700 dark:text-white mb-3 break-all">{email}</p>
-            <p className="text-sm text-gray-400 dark:text-white/35 mb-8">{c.sub2}</p>
+            <p className="text-sm text-gray-400 dark:text-white/35 mb-8">{isVerify ? c.sub2Verify : c.sub2Reset}</p>
 
             {/* Resend */}
             <button onClick={handleResend} disabled={status !== "idle"}

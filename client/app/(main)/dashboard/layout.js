@@ -34,7 +34,8 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     if (!isLoggedIn) router.replace("/signin");
-  }, [isLoggedIn, router]);
+    else if (user?.role === "admin") router.replace("/admin");
+  }, [isLoggedIn, user, router]);
 
   if (!user) return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d1a] flex items-center justify-center">
@@ -63,9 +64,10 @@ export default function DashboardLayout({ children }) {
             <div className="flex flex-col h-full">
               <div className={`p-5 border-b ${br}`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-lg shrink-0 shadow-lg shadow-[#f0a500]/30">
-                    {initials}
-                  </div>
+                  {user.picture
+                    ? <img src={user.picture} alt={user.name} referrerPolicy="no-referrer" className="w-12 h-12 rounded-full object-cover shrink-0 shadow-lg" />
+                    : <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-lg shrink-0 shadow-lg shadow-[#f0a500]/30">{initials}</div>
+                  }
                   <div className="min-w-0">
                     <p className="font-bold text-gray-800 dark:text-white text-sm truncate">{user.name}</p>
                     <p className={`text-xs ${muted} truncate`}>{user.email}</p>
@@ -113,9 +115,10 @@ export default function DashboardLayout({ children }) {
         {/* Mobile top bar */}
         <div className={`${nBg} border-b ${br} px-4 py-3 flex items-center justify-between shrink-0`}>
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow">
-              {initials}
-            </div>
+            {user.picture
+              ? <img src={user.picture} alt={user.name} referrerPolicy="no-referrer" className="w-9 h-9 rounded-full object-cover shrink-0 shadow" />
+              : <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f0a500] to-[#c97000] flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow">{initials}</div>
+            }
             <div className="min-w-0">
               <p className="font-bold text-gray-800 dark:text-white text-sm leading-tight truncate">{user.name}</p>
               <p className={`text-[11px] ${muted} truncate`}>{user.email}</p>
