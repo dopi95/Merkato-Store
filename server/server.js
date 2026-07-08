@@ -16,6 +16,9 @@ app.use((req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 
+app.get('/', (req, res) => res.json({ status: 'ok', message: 'Merkato API is running' }));
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 const PORT = process.env.PORT || 5001;
 
 connectDB().then(() => {
