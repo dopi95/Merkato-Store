@@ -12,9 +12,7 @@ model User {
   name                String
   email               String    @unique
   password            String
-  isVerified          Boolean   @default(false)
-  verifyToken         String?
-  verifyTokenExpiry   DateTime?
+  isVerified          Boolean   @default(true)
   resetToken          String?
   resetTokenExpiry    DateTime?
   googleId            String?   @unique

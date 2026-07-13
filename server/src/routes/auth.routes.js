@@ -1,15 +1,13 @@
 import { Router } from 'express';
 import passport from '../config/passport.js';
 import jwt from 'jsonwebtoken';
-import { register, login, verifyEmail, resendVerification, forgotPassword, resetPassword, updateProfile, changePassword } from '../controllers/auth.controller.js';
+import { register, login, forgotPassword, resetPassword, updateProfile, changePassword } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/verify-email', verifyEmail);
-router.post('/resend-verification', resendVerification);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.get('/me', protect, (req, res) => res.json(req.user));

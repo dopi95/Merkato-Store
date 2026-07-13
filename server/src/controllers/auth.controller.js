@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import prisma from '../config/db.js';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../config/email.js';
+import { sendPasswordResetEmail } from '../config/email.js';
 
 const PW_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
@@ -21,19 +21,12 @@ export async function register(req, res) {
     if (exists) return res.status(409).json({ message: 'Email already in use' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const verifyToken = crypto.randomBytes(32).toString('hex');
-    const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    await prisma.user.create({
-        data: { name, email, password: hashed, verifyToken, verifyTokenExpiry },
+    const user = await prisma.user.create({
+        data: { name, email, password: hashed },
     });
 
-    try {
-        await sendVerificationEmail(email, verifyToken);
-    } catch (err) {
-        console.error('Email send failed:', err.message);
-    }
-    res.status(201).json({ message: 'Account created. Please verify your email.' });
+    const token = signToken(user.id, user.role);
+    res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
 }
 
 export async function login(req, res) {
@@ -44,48 +37,9 @@ export async function login(req, res) {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ message: 'Invalid credentials' });
 
-    if (!user.isVerified)
-        return res.status(403).json({ message: 'Please verify your email first' });
-
     const token = signToken(user.id, user.role);
-    const { password: _, verifyToken, resetToken, verifyTokenExpiry, resetTokenExpiry, ...safeUser } = user;
+    const { password: _, resetToken, resetTokenExpiry, ...safeUser } = user;
     res.json({ token, user: safeUser });
-}
-
-export async function verifyEmail(req, res) {
-    const { token } = req.query;
-    const user = await prisma.user.findFirst({
-        where: { verifyToken: token, verifyTokenExpiry: { gt: new Date() } },
-    });
-    if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
-
-    await prisma.user.update({
-        where: { id: user.id },
-        data: { isVerified: true, verifyToken: null, verifyTokenExpiry: null },
-    });
-    res.json({ message: 'Email verified successfully' });
-}
-
-export async function resendVerification(req, res) {
-    const { email } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || user.isVerified)
-        return res.json({ message: 'If that email exists and is unverified, a new link was sent.' });
-
-    const verifyToken = crypto.randomBytes(32).toString('hex');
-    const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    await prisma.user.update({
-        where: { id: user.id },
-        data: { verifyToken, verifyTokenExpiry },
-    });
-
-    try {
-        await sendVerificationEmail(email, verifyToken);
-    } catch (err) {
-        console.error('Email send failed:', err.message);
-    }
-    res.json({ message: 'If that email exists and is unverified, a new link was sent.' });
 }
 
 export async function forgotPassword(req, res) {
